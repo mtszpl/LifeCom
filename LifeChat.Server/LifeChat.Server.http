@@ -1,0 +1,6 @@
+@LifeChat.Server_HostAddress = http://localhost:5169
+
+GET {{LifeChat.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

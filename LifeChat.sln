@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LifeChat.Server", "LifeChat.Server\LifeChat.Server.csproj", "{224320DB-1769-4D8F-A072-29E19A93F35F}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "lifechat.client", "lifechat.client\lifechat.client.esproj", "{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{224320DB-1769-4D8F-A072-29E19A93F35F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{224320DB-1769-4D8F-A072-29E19A93F35F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{224320DB-1769-4D8F-A072-29E19A93F35F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{224320DB-1769-4D8F-A072-29E19A93F35F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72D69FB4-33E8-42BC-94E0-DDEDB65BF63D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3634009E-B102-44CC-A46B-2954225155C6}
+	EndGlobalSection
+EndGlobal
