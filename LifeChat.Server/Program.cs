@@ -1,4 +1,5 @@
 using LifeChat.Server.Data;
+using LifeChat.Server.Filters;
 using LifeChat.Server.Hubs;
 using LifeChat.Server.Models;
 
@@ -18,7 +19,10 @@ builder.Services.AddDbContext<LifeComContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LifeComContext") ?? throw new InvalidOperationException("Connection string 'LifeComContext' not found."));
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<CustomFilterTest>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

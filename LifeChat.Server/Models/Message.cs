@@ -12,6 +12,8 @@ namespace LifeChat.Server.Models
 
         public required int senderId { get; set; }
 
-        public required int receiventId { get; set; }
+        public int? receiventId { get; set; }
+
+        public DateTime timestamp { get; set; } = DateTime.UtcNow;
     }
 }
