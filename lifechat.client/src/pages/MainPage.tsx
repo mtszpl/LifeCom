@@ -15,8 +15,8 @@ function MainPage() {
         dispatch(setConnector(signalConnector))
     },[])
 
-    const [drawerOpen, setDrawerOpen] = useState(false)
-    const [contentOffset, setContentOffset] = useState(0)
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
+    const [contentOffset, setContentOffset] = useState<number>(0)
     const drawerWidth: number = 20
     const drawerTransitionTime: number = 400
 

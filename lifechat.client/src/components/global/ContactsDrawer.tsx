@@ -17,7 +17,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   // React.useEffect(() => console.log(open), [open])
   const theme = useTheme()
 
-  const [drawerOpen, setDrawerOpen] = useState(props.open)
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
   useEffect(() => setDrawerOpen(props.open), [props.open])
 
   const toggleOpen = () => {
