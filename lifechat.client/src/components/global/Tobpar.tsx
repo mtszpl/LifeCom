@@ -8,6 +8,7 @@ import { useContext } from 'react';
 export interface ITopbarProps {
   drawerWidth: number
   drawerTransitionTime: number
+  height?: number
   onMenuOpen?: () => void
 }
 
@@ -16,7 +17,7 @@ export function Topbar (props: ITopbarProps) {
     const colors = tokens(theme.palette.mode)
     const colorMode = useContext(ColorModecontext)
 
-    const height = 5;
+    const height = props.height ?? 5;
 
   return (
     <Box sx={{width:"100%", height: `${height}vh`}}>
@@ -28,7 +29,7 @@ export function Topbar (props: ITopbarProps) {
       }}>
         <Box sx={{height: `${height}vh`}} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
-            <IconButton onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
+            <IconButton sx={{marginLeft: "1vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
               <MenuIcon/>
             </IconButton>
             <Typography variant='h3' color={colors.white[200]} ml="2vh">

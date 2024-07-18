@@ -1,18 +1,18 @@
-import { Theme, createTheme } from "@mui/material"
+import { createTheme } from "@mui/material"
 import { createContext, useMemo, useState } from "react"
 
 export const tokens = (mode: string) => ({
     ...(mode === "dark") ? {
         primary: {
-          100: "#d3d0d5",
-          200: "#a6a1aa",
-          300: "#7a7180",
-          400: "#4d4255",
-          500: "#21132b",
-          600: "#1a0f22",
-          700: "#140b1a",
-          800: "#0d0811",
-          900: "#070409"
+          100: "#d6d6d9",
+          200: "#adadb3",
+          300: "#85848e",
+          400: "#5c5b68",
+          500: "#333242",
+          600: "#292835",
+          700: "#1f1e28",
+          800: "#14141a",
+          900: "#0a0a0d"
         },
         gray: {
           100: "#e0e0e0",
@@ -76,15 +76,15 @@ export const tokens = (mode: string) => ({
 
     } : {
         primary: {
-            100: "#070409",
-            200: "#0d0811",
-            300: "#140b1a",
-            400: "#1a0f22",
-            500: "#21132b",
-            600: "#4d4255",
-            700: "#7a7180",
-            800: "#a6a1aa",
-            900: "#d3d0d5"
+          100: "#e7e7e7",
+          200: "#cecece",
+          300: "#b6b6b6",
+          400: "#9d9d9d",
+          500: "#858585",
+          600: "#6a6a6a",
+          700: "#505050",
+          800: "#353535",
+          900: "#1b1b1b"
         },
         gray: {
             100: "#141414",
@@ -151,10 +151,19 @@ export const themeSettings = (mode: string) => {
       mode: mode,
       ...(mode === 'dark' ? {
         primary: {
-          main: colors.primary[500],
+          main: colors.primary[700],
+          dark: colors.primary[900],
+          light: colors.primary[500],
         },
         secondary: {
-          main: colors.white[500]
+          main: colors.white[500],
+          light: colors.white[100],
+          dark: colors.white[400]
+        },
+        tonalOffset: {
+          main: colors.blueAccent[500],
+          light: colors.blueAccent[300],
+          dark: colors.blueAccent[800],
         },
         warn: {
           main: colors.redAccent[500]
@@ -165,16 +174,27 @@ export const themeSettings = (mode: string) => {
           light: colors.gray[100],
         },
         background: {
-          default: colors.primary[700]
+          default: colors.primary[600],
+          dark: colors.primary[800],
+          light: colors.primary[400],
         }
         
       } : {
         //light mode
         primary: {
-          main: colors.primary[900],
+          main: colors.primary[300],
+          light: colors.primary[100],
+          dark: colors.primary[500],
         },
         secondary:{
-          main: colors.white[100]
+          main: colors.white[300],
+          light: colors.white[100],
+          dark: colors.gray[100]
+        },
+        tonalOffset: {
+          main: colors.redAccent[500],
+          light: colors.blueAccent[300],
+          dark: colors.blueAccent[800],
         },
         neutral: {
           dark: colors.gray[100],
@@ -182,7 +202,9 @@ export const themeSettings = (mode: string) => {
           light: colors.gray[700],
         },
         background: {
-          default: colors.primary[800]
+          default: colors.primary[500],
+          light: colors.primary[300],
+          dark: colors.primary[700], 
         }
       })
     },

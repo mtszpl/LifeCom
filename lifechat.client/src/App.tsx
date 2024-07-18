@@ -1,5 +1,5 @@
 import { ColorModecontext, useMode } from './Theme';
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import { Box, CssBaseline, ThemeProvider } from '@mui/material';
 import './App.css';
 import { Provider } from 'react-redux';
 import store from './store/store';

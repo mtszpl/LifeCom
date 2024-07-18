@@ -8,13 +8,13 @@ import { useEffect, useState } from 'react';
 interface IDrawerProps {
   open: boolean
   width: number 
+  height?: number
   transitionTime? : number
   handleClose?: (newState: boolean) => void
 }
 
 export function ContactsDrawer (props: IDrawerProps) {
 
-  // React.useEffect(() => console.log(open), [open])
   const theme = useTheme()
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
@@ -22,7 +22,8 @@ export function ContactsDrawer (props: IDrawerProps) {
 
   const toggleOpen = () => {
     setDrawerOpen(!drawerOpen)
-    props.handleClose(!drawerOpen)
+    if(props.handleClose !== undefined)
+      props.handleClose(!drawerOpen)
   }
 
   return (
@@ -30,7 +31,7 @@ export function ContactsDrawer (props: IDrawerProps) {
       sx={{
         width: `${props.width}vw`,
         flexShrink: 0,
-        bgcolor: theme.palette.background,
+        bgcolor: theme.palette.background.default,
         '& .MuiDrawer-paper': {
           width: `${props.width}vw`,
           boxSizing: "border-box"
@@ -41,11 +42,14 @@ export function ContactsDrawer (props: IDrawerProps) {
       open={props.open}
       transitionDuration={props.transitionTime !== undefined ? props.transitionTime : 300}
       >
-        <Box display="flex" alignItems="center" height="5vh" justifyContent="flex-end" bgcolor={theme.palette.primary.main}>
+        <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.primary.main}>
           Contacts
           <IconButton onClick={() => toggleOpen()}>
             <ChevronLeft/>
           </IconButton>
+        </Box>
+        <Box display="flex" alignItems="flex-start" height="100%" bgcolor={theme.palette.background.dark}>
+          eee
         </Box>
     </Drawer>
   );
