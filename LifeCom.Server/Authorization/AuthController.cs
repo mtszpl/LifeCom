@@ -1,0 +1,101 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using LifeCom.Server.Users;
+using LifeCom.Server.Data;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System.Linq;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+
+namespace LifeCom.Server.Authorization
+{
+    [Route("api/[controller]")]
+    public class AuthController : Controller
+    {
+        private readonly LifeComContext _context;
+        //used for debugging
+        private User? localUser;
+        private readonly IConfiguration _configuration;
+
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            base.OnActionExecuting(context);
+        }
+
+        public AuthController(LifeComContext context, IConfiguration configuration)
+        {
+            _context = context;
+            _configuration = configuration;
+        }
+
+        [HttpGet]
+        public void Index()
+        {
+        }
+
+        [HttpPost("register")]
+        public ActionResult<User> Register(UserRequest request)
+        {
+
+            if (request.username == string.Empty || request.password == string.Empty)
+                return BadRequest();
+
+            string passwordHashed = BCrypt.Net.BCrypt.HashPassword(request.password);
+            User user = new User
+            {
+                username = request.username,
+                passwordHash = passwordHashed,
+                password = request.password,
+                email = request.email,
+            };
+            localUser = user;
+            //_context.Add<User>(user);
+            if(_context.AddUser(user))
+            {
+                _context.SaveChanges();
+                return Ok(user);
+            }
+            return BadRequest("User already exists");
+        }
+
+        [HttpPost("login")]
+        public ActionResult<User> Login(UserRequest request)
+        {
+            if (request.username == string.Empty || request.password == string.Empty)
+                return BadRequest("No arguments");
+
+            User? searchedUser = _context.Users
+                .SingleOrDefault(user => user.username == request.username);
+            if (searchedUser == null)
+                return BadRequest("Username or password wrong");
+            if (!BCrypt.Net.BCrypt.Verify(request.password, searchedUser.passwordHash))
+                return BadRequest("Username or password wrong");
+
+            return Ok(CreateToken(searchedUser));
+        }
+
+        private string CreateToken(User user)
+        {
+            List<Claim> claims = new List<Claim>() 
+            {
+                new Claim(ClaimTypes.Name, user.username)
+            };
+
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+                _configuration.GetSection("AppSettings:Token").Value!));
+            SigningCredentials cred = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+
+            JwtSecurityToken token = new JwtSecurityToken(
+                    claims: claims,
+                    expires: DateTime.Now.AddDays(1),
+                    signingCredentials: cred
+                );
+
+            string jwt = new JwtSecurityTokenHandler().WriteToken(token);
+            return jwt;
+        }
+
+
+    }
+}
