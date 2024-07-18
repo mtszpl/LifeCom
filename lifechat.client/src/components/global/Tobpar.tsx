@@ -32,7 +32,7 @@ export function Topbar (props: ITopbarProps) {
               <MenuIcon/>
             </IconButton>
             <Typography variant='h3' color={colors.white[200]} ml="2vh">
-              LifeChat
+              LifeCom
             </Typography>
           </Box>
           <span/>
