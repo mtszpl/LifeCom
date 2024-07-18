@@ -24,7 +24,6 @@ function MainPage() {
     useEffect(() => {
         drawerOpen === true ? setContentOffset(drawerWidth) :
             setContentOffset(0)
-        console.log(drawerOpen, contentOffset);
     }, [drawerOpen])
 
     const dispatch = useDispatch()

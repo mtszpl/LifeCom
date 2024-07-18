@@ -196,14 +196,17 @@ export const themeSettings = (mode: string) => {
           light: colors.blueAccent[300],
           dark: colors.blueAccent[800],
         },
+        warn: {
+          main: colors.redAccent[500]
+        },
         neutral: {
           dark: colors.gray[100],
           main: colors.gray[500],
           light: colors.gray[700],
         },
         background: {
-          default: colors.primary[500],
-          light: colors.primary[300],
+          default: colors.primary[400],
+          light: colors.primary[200],
           dark: colors.primary[700], 
         }
       })

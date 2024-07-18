@@ -4,6 +4,7 @@ import { AppBar, Box, IconButton, Typography } from '@mui/material';
 import { AccountCircle, BrightnessHigh, BrightnessLowOutlined } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export interface ITopbarProps {
   drawerWidth: number
@@ -16,6 +17,8 @@ export function Topbar (props: ITopbarProps) {
     const theme = useTheme()
     const colors = tokens(theme.palette.mode)
     const colorMode = useContext(ColorModecontext)
+
+    const navigate = useNavigate()
 
     const height = props.height ?? 5;
 
@@ -38,7 +41,7 @@ export function Topbar (props: ITopbarProps) {
           </Box>
           <span/>
           <Box display="flex">
-            <IconButton>
+            <IconButton onClick={() => navigate(`/login`)}>
               <AccountCircle/>
             </IconButton>
             <IconButton
