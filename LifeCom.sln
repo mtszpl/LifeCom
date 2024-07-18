@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LifeCom.Server", "LifeCom.Server\LifeCom.Server.csproj", "{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "lifecom.client", "lifechat.client\lifecom.client.esproj", "{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3634009E-B102-44CC-A46B-2954225155C6}
+	EndGlobalSection
+EndGlobal

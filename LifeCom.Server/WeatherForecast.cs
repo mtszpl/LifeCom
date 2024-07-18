@@ -1,4 +1,4 @@
-namespace LifeChat.Server
+namespace LifeCom.Server
 {
     public class WeatherForecast
     {
