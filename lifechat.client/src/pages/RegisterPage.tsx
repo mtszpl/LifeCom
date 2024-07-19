@@ -124,7 +124,7 @@ export function RegisterPage () {
                 },
                 complete() {
                     subscription.unsubscribe()                    
-                    reroute("/")
+                    reroute("/main")
                 }
             })
     }
@@ -135,7 +135,8 @@ export function RegisterPage () {
             <Typography variant='h2'>Register</Typography>
             <Box component="form" width="80%" onSubmit={e => register(e)}>
                 <TextField
-                    margin="normal"                    
+                    margin="normal"
+                    required                    
                     fullWidth
                     label="E-Mail"
                     type="email"
@@ -143,17 +144,18 @@ export function RegisterPage () {
                     autoFocus
                     onChange={e => handleEmailChange(e)}
                     error={emailError}
-                    helperText={emailError ? "Enter email or username" : ""}
+                    helperText={emailError ? "Enter email" : ""}
                 />
                 <TextField
-                    margin="normal"                    
+                    margin="normal"
+                    required                    
                     fullWidth
                     id="username"
                     label="Username"
                     name="username"
                     onChange={e => handleNameChange(e)}
                     error={nameError}
-                    helperText={nameError ? "Enter username or email" : ""}
+                    helperText={nameError ? "Enter username" : ""}
                 />
                 <TextField
                     margin="normal"

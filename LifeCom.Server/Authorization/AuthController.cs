@@ -53,7 +53,7 @@ namespace LifeCom.Server.Authorization
 
             if(_context.AddUser(user))
             {
-                //_context.SaveChanges();
+                _context.SaveChanges();
                 return Ok(CreateToken(user));
             }
             return BadRequest("User already exists");
@@ -62,11 +62,16 @@ namespace LifeCom.Server.Authorization
         [HttpPost("login")]
         public ActionResult<User> Login([FromBody]UserRequest request)
         {
-            if (request.username == string.Empty || request.password == string.Empty)
+            if ((request.username == string.Empty && request.email == string.Empty) || request.password == string.Empty)
                 return BadRequest("No arguments");
 
-            User? searchedUser = _context.Users
-                .SingleOrDefault(user => user.username == request.username);
+            User? searchedUser = null;
+            if(request.username != string.Empty)
+                searchedUser = _context.Users
+                    .SingleOrDefault(user => user.username == request.username);
+            else
+                searchedUser = _context.Users
+                    .SingleOrDefault(user => user.email == request.email);
             if (searchedUser == null)
                 return BadRequest("Username or password wrong");
             if (!BCrypt.Net.BCrypt.Verify(request.password, searchedUser.passwordHash))
