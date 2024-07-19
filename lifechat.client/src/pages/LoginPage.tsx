@@ -13,7 +13,7 @@ export function LoginPage () {
     const theme: Theme = useTheme()
     const colors = tokens(theme.palette.mode)
 
-    const [username, setUsername] = useState<string>("")
+    const [loginString, setLoginString] = useState<string>("")
     const [nameError, setNameError] = useState<boolean>(false)
     
     const [password, setPassword] = useState<string>("")
@@ -28,7 +28,7 @@ export function LoginPage () {
     const dispatch = useDispatch()
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>{
-      setUsername(e.target.value)
+      setLoginString(e.target.value)
       if(e.target.validity.valid)
         setNameError(false)
       else
@@ -43,11 +43,22 @@ export function LoginPage () {
         setPasswordError(true)
     }
 
+    const isEmail = (username: string) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      console.log("testing for email");
+      console.log(emailRegex.test(username));
+      return emailRegex.test(username);
+  };
+
     const handleSubmit = (e) => {
       e.preventDefault()
       if(!e.target.checkValidity())
         return
-      const subsciption = HttpClient.post(loginUrl, {username: username, password: password, email: null})
+      const payload = !isEmail(loginString) ?
+       {username: loginString, password: password, email: null}
+       : {username: null, password: password, email: loginString}
+      console.log(payload)
+      const subsciption = HttpClient.post(loginUrl, payload)
         .subscribe({
           next(response) {
             console.log(response)
@@ -61,7 +72,7 @@ export function LoginPage () {
           complete() {
             setFormErrorMsg(undefined)
             subsciption.unsubscribe()
-            reroute("/")
+            reroute("/main")
           }
         });
     }
@@ -77,12 +88,12 @@ export function LoginPage () {
               required
               fullWidth
               id="username"
-              label="Username"
+              label="Username or email"
               name="username"
               autoFocus
               onChange={e => handleNameChange(e)}
               error={nameError}
-              helperText={nameError ? "Enter username" : ""}
+              helperText={nameError ? "Enter username or email" : ""}
             />
           <TextField
             margin="normal"
