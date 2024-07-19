@@ -3,6 +3,11 @@ import { Box, Button, Checkbox, FormControlLabel, Link, TextField, Theme, Typogr
 import * as React from 'react';
 import { useState } from 'react';
 import { tokens } from '../Theme';
+import HttpClient from '../utility/HttpClient';
+import { first } from 'rxjs';
+import { useDispatch, useSelector } from 'react-redux';
+import { setToken } from '../store/slices/UserSlice';
+import { useNavigate } from 'react-router-dom';
 
 export function LoginPage () {
     const theme: Theme = useTheme()
@@ -13,6 +18,14 @@ export function LoginPage () {
     
     const [password, setPassword] = useState<string>("")
     const [passwordError, setPasswordError] = useState<boolean>(false)
+
+    const [formErrorMsg, setFormErrorMsg] = useState<string | undefined>(undefined)
+
+    const loginUrl: string = `https://localhost:7078/api/Auth/login`
+    const reroute = useNavigate()
+
+    const user = useSelector(state => state.user)
+    const dispatch = useDispatch()
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>{
       setUsername(e.target.value)
@@ -32,8 +45,24 @@ export function LoginPage () {
 
     const handleSubmit = (e) => {
       e.preventDefault()
-      if(e.target.checkValidity())
-      console.log("logging in");
+      if(!e.target.checkValidity())
+        return
+      const subsciption = HttpClient.post(loginUrl, {username: username, password: password, email: null})
+        .subscribe({
+          next(response) {
+            console.log(response)
+            dispatch(setToken(response))
+            reroute("/")
+          },
+          error(err: Error) {
+            console.error(err); // Handle errors here
+            setFormErrorMsg(err.message)
+          },
+          complete() {
+            setFormErrorMsg(undefined)
+            subsciption.unsubscribe()
+          }
+        });
     }
 
   return (
@@ -75,17 +104,19 @@ export function LoginPage () {
               fullWidth
               variant="contained"
             >
-              Sign In
-            </Button>
+            Sign In
+          </Button>
 
-            <Box display="flex" justifyContent="space-between" marginTop="1vh">
-              <Link>
-                <Typography color={colors.blueAccent[200]}>Forgot password?</Typography>
-              </Link>
-              <Link href="register" variant="body2">
-                <Typography color={colors.blueAccent[200]}>Don't have an account? Sign up!</Typography>
-              </Link>
-            </Box>
+          { formErrorMsg !== undefined && <Typography color={colors.redAccent[500]}>{formErrorMsg}</Typography>}
+
+          <Box display="flex" justifyContent="space-between" marginTop="1vh">
+            <Link>
+              <Typography color={colors.blueAccent[200]}>Forgot password?</Typography>
+            </Link>
+            <Link href="register" variant="body2">
+              <Typography color={colors.blueAccent[200]}>Don't have an account? Sign up!</Typography>
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Box>
