@@ -11,6 +11,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace LifeCom.Server.Authorization
 {
     [Route("api/[controller]")]
+    [ApiController]
     public class AuthController : Controller
     {
         private readonly LifeComContext _context;
@@ -60,7 +61,7 @@ namespace LifeCom.Server.Authorization
         }
 
         [HttpPost("login")]
-        public ActionResult<User> Login(UserRequest request)
+        public ActionResult<User> Login([FromBody]UserRequest request)
         {
             if (request.username == string.Empty || request.password == string.Empty)
                 return BadRequest("No arguments");

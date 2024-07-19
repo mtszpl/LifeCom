@@ -35,6 +35,19 @@ builder.Services.AddSwaggerGen(options =>
 //SignalIR for Websocket
 builder.Services.AddSignalR();
 
+
+string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+            policy =>
+            {
+                policy.WithOrigins("https://localhost:5173")
+                .WithHeaders("Content-Type");
+            });
+});
+
 //Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options => {
@@ -45,19 +58,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 builder.Configuration.GetSection("AppSettings:Token").Value!)),
             ValidateIssuer = false,
             ValidateAudience = false
-    };
-});
-
-string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-            policy =>
-            {
-                policy.WithOrigins("https://localhost:5173/");
-            });
-});
+        };
+    });
 
 builder.Services.AddControllers();
 
@@ -80,6 +82,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors(MyAllowSpecificOrigins);
+
+app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -90,7 +95,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=index}/{id?}");
 
-//app.UseCors(MyAllowSpecificOrigins);
 app.MapFallbackToFile("/index.html");
 app.MapHub<ChatHub>("/hub");
 //app.MapGet("/", (ClaimsPrincipal user) => "kurłaaaa")
