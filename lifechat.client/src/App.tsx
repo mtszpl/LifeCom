@@ -6,6 +6,7 @@ import store from './store/store';
 import MainPage from './pages/MainPage';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 
 function App() {
     const [theme, colorMode] = useMode()
@@ -22,6 +23,7 @@ function App() {
                             <Route path="/login" element={
                                 condition ? <LoginPage/> : <Navigate to={"/"}/>
                             }/>
+                            <Route path="/register" element={<RegisterPage/>}/>
                         </Routes>
                     </Provider>
             </ThemeProvider>

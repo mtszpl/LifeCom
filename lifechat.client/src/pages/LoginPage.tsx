@@ -52,7 +52,7 @@ export function LoginPage () {
           next(response) {
             console.log(response)
             dispatch(setToken(response))
-            reroute("/")
+            localStorage.setItem("token", response)
           },
           error(err: Error) {
             console.error(err); // Handle errors here
@@ -61,14 +61,16 @@ export function LoginPage () {
           complete() {
             setFormErrorMsg(undefined)
             subsciption.unsubscribe()
+            reroute("/")
           }
         });
     }
 
   return (
-    <Box width="100%" height="100%" display="flex" bgcolor={theme.palette.background.default} justifyContent="center" alignItems="center">
-      <Box width="35%" borderRadius="12px" bgcolor={theme.palette.background.light} display="flex" flexDirection="column" justifyContent="center" alignItems="center" paddingY="2vh">
-        <Typography variant="h3">Sign in</Typography>
+    <Box width="100%" height="100%" display="flex" bgcolor={theme.palette.background.dark} justifyContent="center" alignItems="center">
+      <Box width="35%" borderRadius="12px"
+        bgcolor={theme.palette.background.light} display="flex" flexDirection="column" justifyContent="center" alignItems="center" paddingY="2vh">
+        <Typography variant="h2">Sign in</Typography>
         <Box component="form" onSubmit={e => handleSubmit(e)} width="80%">
           <TextField
               margin="normal"
