@@ -30,7 +30,7 @@ namespace LifeCom.Server.Models
                 };
                 User carlos = new User
                 {
-                    username = "ChilliCarlos",
+                    username = "SmoothSainz",
                     password = "SmoothOperator1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("SmoothOperator1!"),
                     email = "carlos.sainz@ferrari.it",
