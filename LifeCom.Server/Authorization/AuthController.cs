@@ -36,11 +36,10 @@ namespace LifeCom.Server.Authorization
         }
 
         [HttpPost("register")]
-        public ActionResult<User> Register(UserRequest request)
+        public ActionResult<User> Register([FromBody]UserRequest request)
         {
-
-            if (request.username == string.Empty || request.password == string.Empty)
-                return BadRequest();
+            if(request.e != null)
+                return BadRequest(request.e.ToString());
 
             string passwordHashed = BCrypt.Net.BCrypt.HashPassword(request.password);
             User user = new User
@@ -51,11 +50,11 @@ namespace LifeCom.Server.Authorization
                 email = request.email,
             };
             localUser = user;
-            //_context.Add<User>(user);
+
             if(_context.AddUser(user))
             {
-                _context.SaveChanges();
-                return Ok(user);
+                //_context.SaveChanges();
+                return Ok(CreateToken(user));
             }
             return BadRequest("User already exists");
         }
