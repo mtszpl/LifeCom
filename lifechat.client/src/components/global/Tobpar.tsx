@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { ColorModecontext, tokens } from '../../Theme';
-import { AppBar, Box, IconButton, Typography } from '@mui/material';
+import { AppBar, Box, Button, IconButton, Typography } from '@mui/material';
 import { AccountCircle, BrightnessHigh, BrightnessLowOutlined } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useContext } from 'react';
@@ -26,13 +26,13 @@ export function Topbar (props: ITopbarProps) {
     <Box sx={{width:"100%", height: `${height}vh`}}>
 
       <AppBar position="absolute" 
-        sx={{height: '5vh', width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.primary.main,
+        sx={{height: '5vh', width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.background.light,
         transition: `width ${props.drawerTransitionTime}ms ease-out`
         
       }}>
         <Box sx={{height: `${height}vh`}} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
-            <IconButton sx={{marginLeft: "1vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
+            <IconButton sx={{ color: colors.white[200], marginLeft: "1vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
               <MenuIcon/>
             </IconButton>
             <Typography variant='h3' color={colors.white[200]} ml="2vh">
@@ -41,6 +41,12 @@ export function Topbar (props: ITopbarProps) {
           </Box>
           <span/>
           <Box display="flex">
+            <Button 
+              variant="contained"
+              onClick={() => navigate("/")}
+              >
+              Log out
+            </Button>
             <IconButton onClick={() => navigate(`/login`)}>
               <AccountCircle/>
             </IconButton>

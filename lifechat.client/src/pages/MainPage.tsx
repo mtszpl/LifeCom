@@ -28,7 +28,6 @@ function MainPage() {
 
     const dispatch = useDispatch()
 
-
     const send = (message: string) => {
         dispatch(sendToConnection(message))
     }
@@ -42,8 +41,6 @@ function MainPage() {
     }
 
     return (
-        // <Container /*sx={{width:"100vw", height:"100%", bgcolor:"tomato" /*{theme.palette.background.default}}}*/>       
-
         <Box sx={{width: '100%', height: '100%', display: "flex", flexDirection: "column"}}>
             <ContactsDrawer height={5} open={drawerOpen} width={drawerWidth} handleClose={updateDrawer} transitionTime={drawerTransitionTime} ></ContactsDrawer>
             <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}></Topbar>
@@ -54,14 +51,14 @@ function MainPage() {
                 height: '100%',
                 marginLeft: `${contentOffset}%`,
                 transition: `margin-left ${drawerTransitionTime}ms ease-in-out`,
-                bgcolor: theme.palette.primary.dark
+                bgcolor: theme.palette.background.default
             }}
             >   
-                <Box className="messages" height="100%" bgcolor={theme.palette.primary.dark}>
+                <Box className="messages" height="100%" bgcolor={theme.palette.background.default}>
                     messages
                 </Box>
-                <Box marginTop="auto" display="flex" marginX="1vw" marginBottom="1vh">
-                    <TextField sx={{ width: "100%", bgcolor: theme.palette.primary.main }} />
+                <Box marginTop="auto" display="flex" marginX="1vw" marginBottom="1vh" bgcolor={theme.palette.background.default} paddingTop="1vh">
+                    <TextField sx={{ width: "100%",  }} />
                     <Button variant="contained" sx={{ bgcolor: theme.palette.primary.light, marginLeft: "0.3vw" }} onClick={(e) => send("eee")}>
                         <SendSharp fontSize="large"/>
                     </Button>

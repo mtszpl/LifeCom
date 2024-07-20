@@ -25,7 +25,17 @@ export const tokens = (mode: string) => ({
           800: "#292929",
           900: "#141414"
         },
-
+        black: {
+          100: "#d7d7d7",
+          200: "#afafaf",
+          300: "#868686",
+          400: "#5e5e5e",
+          500: "#363636",
+          600: "#2b2b2b",
+          700: "#202020",
+          800: "#161616",
+          900: "#0b0b0b"
+        },
         yellowAccent: {
           100: "#fff5d0",
           200: "#ffeba1",
@@ -49,7 +59,6 @@ export const tokens = (mode: string) => ({
           800: "#4d1919",
           900: "#260c0d"
         },
-
         white: {
           100: "#fcfcfc",
           200: "#fafafa",
@@ -61,7 +70,6 @@ export const tokens = (mode: string) => ({
           800: "#616161",
           900: "#303030"
         },
-
         blueAccent: {
           100: "#e1e2fe",
           200: "#c3c6fd",
@@ -97,6 +105,17 @@ export const tokens = (mode: string) => ({
             800: "#c2c2c2",
             900: "#e0e0e0"
         },
+        black: {
+          100: "#d7d7d7",
+          200: "#afafaf",
+          300: "#868686",
+          400: "#5e5e5e",
+          500: "#363636",
+          600: "#2b2b2b",
+          700: "#202020",
+          800: "#161616",
+          900: "#0b0b0b"
+        },
         redAccent: {
             100: "#260c0d",
             200: "#4d1919",
@@ -120,15 +139,15 @@ export const tokens = (mode: string) => ({
             900: "#fff5d0"
         },
         white: {
-            100: "#303030",
-            200: "#616161",
-            300: "#919191",
-            400: "#c2c2c2",
-            500: "#f2f2f2",
-            600: "#f5f5f5",
-            700: "#f7f7f7",
-            800: "#fafafa",
-            900: "#fcfcfc",
+          100: "#fcfcfc",
+          200: "#fafafa",
+          300: "#f7f7f7",
+          400: "#f5f5f5",
+          500: "#f2f2f2",
+          600: "#c2c2c2",
+          700: "#919191",
+          800: "#616161",
+          900: "#303030"
         },
         blueAccent: {
             100: "#151632",
@@ -151,14 +170,15 @@ export const themeSettings = (mode: string) => {
       mode: mode,
       ...(mode === 'dark' ? {
         primary: {
-          main: colors.primary[700],
+          main: colors.primary[500],
           dark: colors.primary[900],
-          light: colors.primary[500],
+          light: colors.primary[300],
         },
         secondary: {
-          main: colors.white[500],
-          light: colors.white[100],
-          dark: colors.white[400]
+          //#3bb9cc
+          main: colors.blueAccent[500],
+          light: colors.blueAccent[100],
+          dark: colors.blueAccent[700]
         },
         tonalOffset: {
           main: colors.blueAccent[500],
@@ -174,22 +194,22 @@ export const themeSettings = (mode: string) => {
           light: colors.gray[100],
         },
         background: {
-          default: colors.primary[600],
-          dark: colors.primary[800],
-          light: colors.primary[400],
+          default: colors.black[700],
+          dark: colors.black[900],
+          light: colors.black[500],
         }
         
       } : {
         //light mode
         primary: {
-          main: colors.primary[300],
+          main: colors.primary[200],
           light: colors.primary[100],
-          dark: colors.primary[500],
+          dark: colors.primary[600],
         },
         secondary:{
-          main: colors.white[300],
+          main: colors.white[500],
           light: colors.white[100],
-          dark: colors.gray[100]
+          dark: colors.white[900]
         },
         tonalOffset: {
           main: colors.redAccent[500],
@@ -205,9 +225,9 @@ export const themeSettings = (mode: string) => {
           light: colors.gray[700],
         },
         background: {
-          default: colors.primary[400],
-          light: colors.primary[200],
-          dark: colors.primary[700], 
+          default: colors.gray[500],
+          light: colors.gray[700],
+          dark: colors.gray[200], 
         }
       })
     },
@@ -252,6 +272,7 @@ export const useMode = () => {
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
+        console.log("changing mode");
         SetMode(prev => {if(prev === "light") return "dark"
            else return "light"})
         console.log(mode);

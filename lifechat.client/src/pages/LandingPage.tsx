@@ -12,7 +12,7 @@ export function LandingPage () {
     const reroute = useNavigate()
 
   return (
-    <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center">
+    <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
         <img src={logo} width="20%"/>
         <Typography variant="h1">
             Welcome to LifeCom
@@ -22,23 +22,20 @@ export function LandingPage () {
             Used by no one, but still cool
         </Typography>
         <Box display="flex" width="20%" gap="4vw" marginTop="1vh">
-            <Button 
+            <Button                 
                 sx={{
-                    bgcolor: theme.palette.secondary.dark,
-                    flex: 1
+                    flex: 1,
                 }}
+                variant="contained"
                 onClick={() => { reroute("/register")} }            
             >
                 Join
             </Button>
             <Button 
                 sx={{
-                    bgcolor: theme.palette.secondary.dark,
-                    flex: 1,
-                    hover: {
-                        bgcolor: theme.palette.secondary.light
-                    }
+                    flex: 1,  
                 }}
+                variant="contained"
                 onClick={() => { reroute("/login")} }
             >
                 Log in

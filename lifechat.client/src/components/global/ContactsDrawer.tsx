@@ -42,7 +42,7 @@ export function ContactsDrawer (props: IDrawerProps) {
       open={props.open}
       transitionDuration={props.transitionTime !== undefined ? props.transitionTime : 300}
       >
-        <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.primary.main}>
+        <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.background.default}>
           Contacts
           <IconButton onClick={() => toggleOpen()}>
             <ChevronLeft/>
