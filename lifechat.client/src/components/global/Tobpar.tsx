@@ -27,8 +27,6 @@ export function Topbar (props: ITopbarProps) {
 
     const height = props.height ?? 5;
 
-    useEffect(() => {console.log(user)}, [user])
-
   return (
     <Box sx={{width:"100%", height: `${height}vh`}}>
 

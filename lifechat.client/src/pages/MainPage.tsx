@@ -8,7 +8,7 @@ import { Topbar } from "../components/global/Tobpar";
 import { ContactsDrawer } from "../components/global/ContactsDrawer";
 import { SendSharp } from "@mui/icons-material";
 import Interceptors from "../API/Interceptors";
-import { setToken, setUsername } from "../store/slices/UserSlice";
+import { setLoggedIn, setToken, setUsername } from "../store/slices/UserSlice";
 import HttpClient from "../utility/HttpClient";
 
 function MainPage() {
@@ -19,21 +19,20 @@ function MainPage() {
     
     useEffect(() => {
         const token = localStorage.getItem("token")
-        console.log(token);
-        console.log(token, username);
         if(token && !username) {
             dispatch(setToken(token))
+            Interceptors.addAuthInterceptor("token")
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
-                    next(value) {
-                        console.log(value.data);
-                        dispatch(setUsername(value))
+                    next(response) {
+                        dispatch(setUsername(response.username))
                     },
                     error(err) {
                         console.error(err.message)
                     },
                     complete() {
                         subscription.unsubscribe()
+                        dispatch(setLoggedIn(true))
                     }
                 })
         }

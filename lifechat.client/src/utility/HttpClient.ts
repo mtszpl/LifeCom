@@ -54,8 +54,15 @@ export default class HttpClient {
      */
     static get = (url: string, getFirst: boolean = true) => {     
         const axiosPromise = HttpClient.API.get(url)
-        console.log(url);
-        return from(axiosPromise).pipe( getFirst ?
+        return from(axiosPromise.then(response => {
+            return response.data
+        }).catch(error => {
+            if (error.response) {
+                throw new Error(error.response.data || error.response.statusText)
+            } else {
+                throw new Error(error.message)
+            }
+        })).pipe( getFirst ?
               first() :
               map(data => data)
             )
@@ -75,9 +82,9 @@ export default class HttpClient {
             return response.data;
         }).catch(error => {
             if (error.response) {
-                throw new Error(error.response.data || error.response.statusText);
+                throw new Error(error.response.data || error.response.statusText)
             } else {
-                throw new Error(error.message);
+                throw new Error(error.message)
             }
         }))}
 
