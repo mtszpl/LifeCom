@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Data;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LifeCom.Server.Chats.Channels
 {
+    [Route("api/[controller]")]
+    [Authorize]
     public class ChannelsController : Controller
     {
         private readonly LifeComContext _context;
@@ -19,10 +23,24 @@ namespace LifeCom.Server.Chats.Channels
         }
 
         // GET: Channels
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    var lifeComContext = _context.Channel.Include(c => c.chat);
+        //    return View(await lifeComContext.ToListAsync());
+        //}
+
+        [HttpGet]
+        public ActionResult<List<Channel>> GetByUser() 
         {
-            var lifeComContext = _context.Channel.Include(c => c.chat);
-            return View(await lifeComContext.ToListAsync());
+            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null)
+                return Forbid("Unauthorized");
+            string? idString = identity.FindFirst("id")?.Value;
+            if(idString == null)
+                return Forbid("Unathorized");
+            int userId = int.Parse(idString);
+
+            return _context.Channel.Where(channel => channel.members.Any(member => member.Id == userId)).ToList();
         }
 
         // POST: Channels/Create
@@ -43,6 +61,7 @@ namespace LifeCom.Server.Chats.Channels
         //}
 
         // GET: Channels/Delete/5
+        [HttpDelete]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

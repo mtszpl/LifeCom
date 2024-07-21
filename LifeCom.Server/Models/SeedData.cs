@@ -13,7 +13,8 @@ namespace LifeCom.Server.Models
         {
             using(LifeComContext context = new LifeComContext(serviceProvider.GetRequiredService<DbContextOptions<LifeComContext>>())) 
             {
-                Chat ferrariChat = new Chat{ Name = "Ferrari inside chat" };
+                Chat ferrariChat = new Chat{ name = "Ferrari inside chat" };
+                Chat theOtherChat = new Chat {  name = "other" };
                 Channel driversChannel = new Channel 
                 {
                     Name = "drivers",
@@ -46,7 +47,7 @@ namespace LifeCom.Server.Models
                 };
 
                 if (!context.Chat.Any())                 
-                    context.Chat.AddRange(ferrariChat);
+                    context.Chat.AddRange(ferrariChat, theOtherChat);
                 
 
                 if(!context.Channel.Any())                
