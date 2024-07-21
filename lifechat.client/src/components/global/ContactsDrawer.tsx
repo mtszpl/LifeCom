@@ -1,8 +1,10 @@
 import { useTheme } from '@emotion/react';
 import { ChevronLeft } from '@mui/icons-material';
-import { Box, Drawer, IconButton } from '@mui/material';
+import { Box, Drawer, IconButton, Typography } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import HttpClient from '../../utility/HttpClient';
 
 
 interface IDrawerProps {
@@ -16,6 +18,26 @@ interface IDrawerProps {
 export function ContactsDrawer (props: IDrawerProps) {
 
   const theme = useTheme()
+
+  const apiUrl: string = "https://localhost:7078/api/"
+  const [channels, setChannels] = useState()
+
+  const isLoggedIn: boolean = useSelector(state => state.user.loggedIn)
+
+  useEffect(() => {
+    console.log(`IsLogged: ${isLoggedIn}`);
+    if(!isLoggedIn)
+      return
+    HttpClient.get(`${apiUrl}Channels`)
+      .subscribe({
+        next(response) {
+          console.log(response);
+        },
+        error(err: Error) { console.error(err.message)},
+        complete() {}
+      })
+  }, [])
+  
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
   useEffect(() => setDrawerOpen(props.open), [props.open])
@@ -43,7 +65,9 @@ export function ContactsDrawer (props: IDrawerProps) {
       transitionDuration={props.transitionTime !== undefined ? props.transitionTime : 300}
       >
         <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.background.default}>
-          Contacts
+          <Typography variant="h3">
+            Contacts
+          </Typography>
           <IconButton onClick={() => toggleOpen()}>
             <ChevronLeft/>
           </IconButton>

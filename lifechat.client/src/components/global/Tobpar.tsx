@@ -3,8 +3,11 @@ import { ColorModecontext, tokens } from '../../Theme';
 import { AppBar, Box, Button, IconButton, Typography } from '@mui/material';
 import { AccountCircle, BrightnessHigh, BrightnessLowOutlined } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo_white.png'
+import { useSelector } from 'react-redux';
+import Interceptors from '../../API/Interceptors';
 
 export interface ITopbarProps {
   drawerWidth: number
@@ -18,9 +21,13 @@ export function Topbar (props: ITopbarProps) {
     const colors = tokens(theme.palette.mode)
     const colorMode = useContext(ColorModecontext)
 
+    const user = useSelector(state => state.user)
+
     const navigate = useNavigate()
 
     const height = props.height ?? 5;
+
+    useEffect(() => {console.log(user)}, [user])
 
   return (
     <Box sx={{width:"100%", height: `${height}vh`}}>
@@ -32,24 +39,34 @@ export function Topbar (props: ITopbarProps) {
       }}>
         <Box sx={{height: `${height}vh`}} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
-            <IconButton sx={{ color: colors.white[200], marginLeft: "1vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
-              <MenuIcon/>
+            <IconButton sx={{ color: colors.white[200], marginX: "0.5vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
+              <MenuIcon fontSize='large'/>
             </IconButton>
+            <img src={logo}  width="5%" color={colors.white[100]}/>
             <Typography variant='h3' color={colors.white[200]} ml="2vh">
               LifeCom
             </Typography>
           </Box>
           <span/>
-          <Box display="flex">
+          <Box display="flex" alignItems="center">
             <Button 
               variant="contained"
-              onClick={() => navigate("/")}
+              onClick={() => {
+                Interceptors.removeAuthInterceptor()
+                navigate("/")}}
               >
               Log out
             </Button>
-            <IconButton onClick={() => navigate(`/login`)}>
+            <IconButton onClick={() => {
+              user.loggedIn ?
+              navigate('/username') :
+              navigate(`/login`)
+            }}>
               <AccountCircle/>
             </IconButton>
+            <Typography variant="h3">
+              { user !== undefined ? user.name : ""}
+            </Typography>
             <IconButton
               onClick={() => colorMode.toggleColorMode()}>
               {

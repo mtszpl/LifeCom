@@ -4,10 +4,10 @@ import * as React from 'react';
 import { useState } from 'react';
 import { tokens } from '../Theme';
 import HttpClient from '../utility/HttpClient';
-import { first } from 'rxjs';
 import { useDispatch, useSelector } from 'react-redux';
-import { setToken } from '../store/slices/UserSlice';
+import { setLoggedIn, setToken, setUsername } from '../store/slices/UserSlice';
 import { useNavigate } from 'react-router-dom';
+import Interceptors from '../API/Interceptors';
 
 export function LoginPage () {
     const theme: Theme = useTheme()
@@ -45,8 +45,6 @@ export function LoginPage () {
 
     const isEmail = (username: string) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      console.log("testing for email");
-      console.log(emailRegex.test(username));
       return emailRegex.test(username);
   };
 
@@ -57,13 +55,14 @@ export function LoginPage () {
       const payload = !isEmail(loginString) ?
        {username: loginString, password: password, email: null}
        : {username: null, password: password, email: loginString}
-      console.log(payload)
       const subsciption = HttpClient.post(loginUrl, payload)
         .subscribe({
           next(response) {
-            console.log(response)
-            dispatch(setToken(response))
-            localStorage.setItem("token", response)
+            console.log(response);
+            dispatch(setToken(response.token))
+            dispatch(setUsername(response.username))
+            dispatch(setLoggedIn(true))
+            localStorage.setItem("token", response.token)
           },
           error(err: Error) {
             console.error(err); // Handle errors here
@@ -72,6 +71,7 @@ export function LoginPage () {
           complete() {
             setFormErrorMsg(undefined)
             subsciption.unsubscribe()
+            Interceptors.addAuthInterceptor()
             reroute("/main")
           }
         });

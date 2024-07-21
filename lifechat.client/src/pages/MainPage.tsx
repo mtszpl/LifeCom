@@ -1,5 +1,5 @@
 import { Box, Button, TextField, Theme, useTheme } from "@mui/material";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector,  } from "react-redux";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { sendToConnection, setConnector } from "../store/slices/ConnectorSlice";
@@ -7,13 +7,40 @@ import { SignalConnector } from "../API/SignalConnector";
 import { Topbar } from "../components/global/Tobpar";
 import { ContactsDrawer } from "../components/global/ContactsDrawer";
 import { SendSharp } from "@mui/icons-material";
+import Interceptors from "../API/Interceptors";
+import { setToken, setUsername } from "../store/slices/UserSlice";
+import HttpClient from "../utility/HttpClient";
 
 function MainPage() {
 
     const theme: Theme = useTheme()
+    const dispatch = useDispatch()
+    const username = useSelector(state => state.user.username)
+    
     useEffect(() => {
+        const token = localStorage.getItem("token")
+        console.log(token);
+        console.log(token, username);
+        if(token && !username) {
+            dispatch(setToken(token))
+            const subscription = HttpClient.get("https://localhost:7078/api/Users")
+                .subscribe({
+                    next(value) {
+                        console.log(value.data);
+                        dispatch(setUsername(value))
+                    },
+                    error(err) {
+                        console.error(err.message)
+                    },
+                    complete() {
+                        subscription.unsubscribe()
+                    }
+                })
+        }
         const signalConnector = new SignalConnector()
         dispatch(setConnector(signalConnector))
+        Interceptors.addAuthInterceptor()
+
     },[])
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
@@ -25,8 +52,6 @@ function MainPage() {
         drawerOpen === true ? setContentOffset(drawerWidth) :
             setContentOffset(0)
     }, [drawerOpen])
-
-    const dispatch = useDispatch()
 
     const send = (message: string) => {
         dispatch(sendToConnection(message))
