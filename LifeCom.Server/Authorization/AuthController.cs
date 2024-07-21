@@ -77,14 +77,15 @@ namespace LifeCom.Server.Authorization
             if (!BCrypt.Net.BCrypt.Verify(request.password, searchedUser.passwordHash))
                 return BadRequest("Username or password wrong");
 
-            return Ok(CreateToken(searchedUser));
+            return Ok(new UserResponse{ username = searchedUser.username, token = CreateToken(searchedUser)});
         }
 
         private string CreateToken(User user)
         {
             List<Claim> claims = new List<Claim>() 
             {
-                new Claim(ClaimTypes.Name, user.username)
+                new Claim(ClaimTypes.Name, user.username),
+                new Claim("id", user.Id.ToString())
             };
 
             SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
