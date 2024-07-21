@@ -44,7 +44,7 @@ builder.Services.AddCors(options =>
             policy =>
             {
                 policy.WithOrigins("https://localhost:5173")
-                .WithHeaders("Content-Type");
+                .WithHeaders("Content-Type", "Authorization");
             });
 });
 
