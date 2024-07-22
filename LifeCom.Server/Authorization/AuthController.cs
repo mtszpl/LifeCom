@@ -141,7 +141,7 @@ namespace LifeCom.Server.Authorization
 
             JwtSecurityToken token = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddSeconds(10),
+                    expires: DateTime.Now.AddMinutes(10),
                     signingCredentials: cred
                 );
 

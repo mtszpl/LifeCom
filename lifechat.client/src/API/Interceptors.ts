@@ -15,6 +15,10 @@ export default class Inteceptors {
     private static refreshInterceptor: number | undefined
     private static refreshUrl = ['/refresh']
 
+    static clearInterceptors () {
+        HttpClient.ejectAllInteceptors()
+    }
+
     static addAuthInterceptor = (key?: string) => {
         if(this.authInterceptor !== undefined){
             console.error("Auth interceptor already added")
@@ -25,12 +29,14 @@ export default class Inteceptors {
             token = localStorage.getItem(key)
         else
             token = store.getState().user.token
-
+        console.log(token);
         this.authInterceptor = HttpClient.addRequestInterceptor((config) => {
+            console.log("intercepting");
             if(this.authUrls.some(url => config.url.includes(url)))
                 return config
             if(token)
                 config.headers.Authorization = `Bearer ${token}`
+            console.log(config);
             return config
         })
 

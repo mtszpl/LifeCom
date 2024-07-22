@@ -21,6 +21,21 @@ export function LoginPage () {
     const [passwordError, setPasswordError] = useState<boolean>(false)
 
     const [formErrorMsg, setFormErrorMsg] = useState<string | undefined>(undefined)
+    const [rememberMe, setRememberMe] = useState<boolean>(false)
+
+    React.useEffect(() => {
+      localStorage.removeItem("remember")
+      localStorage.removeItem("token")
+      Interceptors.clearInterceptors()
+    }, [])
+
+    const toggleRememberMe = () => {
+      setRememberMe(!rememberMe)
+    }
+
+    React.useEffect(() => {
+      console.log(rememberMe);
+    }, [rememberMe])
 
     const loginUrl: string = `https://localhost:7078/api/Auth/login`
     const reroute = useNavigate()
@@ -53,9 +68,13 @@ export function LoginPage () {
       e.preventDefault()
       if(!e.target.checkValidity())
         return
+      console.log(rememberMe);
+      if(rememberMe)
+        localStorage.setItem("remember", "true")
       const payload = !isEmail(loginString) ?
-       {username: loginString, password: password, email: null}
-       : {username: null, password: password, email: loginString}
+      {username: loginString, password: password, email: null}
+      : {username: null, password: password, email: loginString}
+      console.log("logging in");
       const subsciption = HttpClient.post(loginUrl, payload)
         .subscribe({
           next(response) {
@@ -106,7 +125,7 @@ export function LoginPage () {
             helperText={passwordError ? "Enter password" : ""}
           />
           <FormControlLabel 
-            control={<Checkbox value="remember" color="primary"/>}
+            control={<Checkbox value="remember" onChange={() => toggleRememberMe()} color="primary"/>}
             label="Remember me"
             sx={{ alignSelf: 'flex-start', width: "100%" }}
           />

@@ -13,6 +13,11 @@ export default class HttpClient {
         console.log(HttpClient.API.interceptors.response);
     }
 
+    static ejectAllInteceptors() {
+        this.API.interceptors.request.clear()
+        this.API.interceptors.response.clear()
+    }
+
     /**
      * Adds request interceptor to API call
      * @param interceptor Interceptor function
@@ -84,8 +89,9 @@ export default class HttpClient {
      */
     static post = (url: string, payload: unknown, params: unknown = undefined, contentType: string = "application/json") => {
         const axiosPromise = HttpClient.API.post(url, payload, {withCredentials: true})
-
+        console.log("post");
         return from(axiosPromise.then(response => {
+            console.log(response);
             return response.data;
         }).catch(error => {
             if (error.response) {

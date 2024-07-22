@@ -59,8 +59,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 builder.Configuration.GetSection("AppSettings:Token").Value!)),
             ValidateIssuer = false,
             ValidateAudience = false,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromSeconds(3)
+            ValidateLifetime = true
         };
     });
 

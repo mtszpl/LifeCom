@@ -15,25 +15,36 @@ function MainPage() {
 
     const theme: Theme = useTheme()
     const dispatch = useDispatch()
+    const storeToken = useSelector(state => state.user.token)
     const isLogged = useSelector(state => state.user.loggedIn)
+
     const reroute = useNavigate()
     
     useEffect(() => {
+        const remember = localStorage.getItem("remember")
+        console.log(remember);
+        console.log(storeToken);
+        
         const signalConnector = new SignalConnector()
         dispatch(setConnector(signalConnector))
-        console.log("set connector");
-
+        
         const token = localStorage.getItem("token")
-        console.log(token && !isLogged);
-        if(token && !isLogged) {
+        console.log(`remember :${(remember === null || remember === undefined) && (storeToken === null || storeToken === undefined)}`);
+        if((remember === null || remember === undefined) && !isLogged) {
+            localStorage.removeItem("token")
+            localStorage.removeItem("remember")
+            console.log("rerouting to landing");
+            reroute("/")
+            return
+        }
+        else if(token && !isLogged) {
             dispatch(setToken(token))
             console.log("setting stuff");
+            Interceptors.addAuthInterceptor("token")
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
                     next(response) {
-                        console.log(`mainpage response`)
-                        console.log(response);
-                        dispatch(setUsername(response.username))
+                        dispatch(setUsername(response))
                         dispatch(setToken(token))
                         dispatch(setLoggedIn(true))
                         localStorage.setItem("token", token)
@@ -44,15 +55,9 @@ function MainPage() {
                     complete() {
                         subscription.unsubscribe()
                         dispatch(setLoggedIn(true))
-                        Interceptors.addAuthInterceptor()
                     }
                 })
         }
-        else if (!token){
-            reroute("/")
-            return
-        }
-        // HttpClient.listInterceptors()
     },[])
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
