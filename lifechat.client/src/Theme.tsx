@@ -272,10 +272,16 @@ export const useMode = () => {
   const colorMode = useMemo(
     () => ({
       toggleColorMode: () => {
-        console.log("changing mode");
-        SetMode(prev => {if(prev === "light") return "dark"
-           else return "light"})
-        console.log(mode);
+        SetMode(prev => {
+            const mode = prev === "light" ? "dark" : "light"
+            localStorage.setItem("theme", mode)
+            return mode 
+        })},
+        setColorMode: (mode: string) => {
+          SetMode(() => {
+            localStorage.setItem("theme", mode)
+            return mode 
+          })
       }
     }), [])
 

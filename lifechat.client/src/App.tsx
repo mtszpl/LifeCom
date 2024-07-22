@@ -1,5 +1,5 @@
 import { ColorModecontext, useMode } from './Theme';
-import { Box, CssBaseline, ThemeProvider } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import './App.css';
 import { Provider } from 'react-redux';
 import store from './store/store';
@@ -8,11 +8,18 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { LandingPage } from './pages/LandingPage';
+import { useEffect } from 'react';
 
 function App() {
     const [theme, colorMode] = useMode()
 
     const condition = true
+
+    useEffect(() => {
+        const mode = localStorage.getItem("theme")
+        if(mode)
+            colorMode.setColorMode(mode)
+    }, [theme])
 
     return (
         <ColorModecontext.Provider value={colorMode}>
@@ -21,7 +28,7 @@ function App() {
                     <Provider store={store}>
                         <Routes>
                             <Route path="/" element={<LandingPage/>}/>
-                            <Route path="/main" element={<MainPage/>}/>
+                            <Route path="/main/*" element={<MainPage/>}/>
                             <Route path="/login" element={
                                 condition ? <LoginPage/> : <Navigate to={"/"}/>
                             }/>
