@@ -8,6 +8,11 @@ export default class HttpClient {
 
     private static API = axios.create({baseURL: ""})
 
+    static listInterceptors() {
+        console.log(HttpClient.API.interceptors.request);
+        console.log(HttpClient.API.interceptors.response);
+    }
+
     /**
      * Adds request interceptor to API call
      * @param interceptor Interceptor function
@@ -46,14 +51,19 @@ export default class HttpClient {
        console.log(`Response interceptors: ${HttpClient.API.interceptors.response.handles}`);
     }
 
+    static request (request) {
+        return from(request)
+    }
+
     /**
      * Executes 'get' request
      * @param url Endpoint url
      * @param getFirst If true returns only first value, default true
      * @returns Observable with data from call or error message if occured
      */
-    static get = (url: string, getFirst: boolean = true) => {     
-        const axiosPromise = HttpClient.API.get(url)
+    static get = (url: string, params: any = undefined) => {     
+        const axiosPromise = HttpClient.API.get(url, {withCredentials: true})
+
         return from(axiosPromise.then(response => {
             return response.data
         }).catch(error => {
@@ -62,10 +72,7 @@ export default class HttpClient {
             } else {
                 throw new Error(error.message)
             }
-        })).pipe( getFirst ?
-              first() :
-              map(data => data)
-            )
+        }))
     }
 
     /**
@@ -75,8 +82,8 @@ export default class HttpClient {
      * @param contentType Content type of request, default application/json
      * @returns Observable with data from call or error message if occured
      */
-    static post = (url: string, payload: unknown, contentType: string = "application/json") => {
-        const axiosPromise = HttpClient.API.post(url, payload)        
+    static post = (url: string, payload: unknown, params: unknown = undefined, contentType: string = "application/json") => {
+        const axiosPromise = HttpClient.API.post(url, payload, {withCredentials: true})
 
         return from(axiosPromise.then(response => {
             return response.data;
@@ -86,7 +93,8 @@ export default class HttpClient {
             } else {
                 throw new Error(error.message)
             }
-        }))}
+        }))
+    }
 
 
 }

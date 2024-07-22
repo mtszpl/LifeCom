@@ -3,10 +3,11 @@ import { Box, Button, Link, TextField, Theme, Typography } from '@mui/material';
 import * as React from 'react';
 import { tokens } from '../Theme';
 import { useState } from 'react';
-import HttpClient from '../utility/HttpClient';
+import HttpClient from '../API/HttpClient';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setToken } from '../store/slices/UserSlice';
+import LoginUtils from '../utility/LoginUtils';
 
 export function RegisterPage () {
     const theme: Theme = useTheme()
@@ -105,7 +106,6 @@ export function RegisterPage () {
     
     const [formErrorMsg, setFormErrorMsg] = useState<string | undefined>(undefined)
     const reroute = useNavigate()
-    const dispatch = useDispatch()
 
     const register = (e) => {
         e.preventDefault()
@@ -114,9 +114,7 @@ export function RegisterPage () {
         const subscription = HttpClient.post(registerUrl, {username: username, password:password, email: email})
             .subscribe({
                 next(response) {
-                    console.log(response)
-                    dispatch(setToken(response))
-                    localStorage.setItem("token", response)
+                    LoginUtils.loginDetails(response)
                 },
                 error(err: Error) {
                     console.error(err)

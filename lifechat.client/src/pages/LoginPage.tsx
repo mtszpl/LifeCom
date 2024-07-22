@@ -3,11 +3,12 @@ import { Box, Button, Checkbox, FormControlLabel, Link, TextField, Theme, Typogr
 import * as React from 'react';
 import { useState } from 'react';
 import { tokens } from '../Theme';
-import HttpClient from '../utility/HttpClient';
+import HttpClient from '../API/HttpClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoggedIn, setToken, setUsername } from '../store/slices/UserSlice';
 import { useNavigate } from 'react-router-dom';
 import Interceptors from '../API/Interceptors';
+import LoginUtils from '../utility/LoginUtils';
 
 export function LoginPage () {
     const theme: Theme = useTheme()
@@ -58,11 +59,8 @@ export function LoginPage () {
       const subsciption = HttpClient.post(loginUrl, payload)
         .subscribe({
           next(response) {
-            console.log(response);
-            dispatch(setToken(response.token))
-            dispatch(setUsername(response.username))
-            dispatch(setLoggedIn(true))
-            localStorage.setItem("token", response.token)
+            console.log("logged in");
+            LoginUtils.loginDetails(response)
           },
           error(err: Error) {
             console.error(err); // Handle errors here

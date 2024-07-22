@@ -11,6 +11,12 @@ export function LandingPage () {
 
     const reroute = useNavigate()
 
+    React.useEffect(() => {
+        const token = localStorage.getItem("token")
+        if(token)
+          reroute("/main")
+      }, [])
+
   return (
     <Box width="100%" height="100%" display="flex" flexDirection="column" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
         <img src={logo} width="20%"/>

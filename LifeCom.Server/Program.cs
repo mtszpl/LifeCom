@@ -44,7 +44,8 @@ builder.Services.AddCors(options =>
             policy =>
             {
                 policy.WithOrigins("https://localhost:5173")
-                .WithHeaders("Content-Type", "Authorization");
+                .WithHeaders("Content-Type", "Authorization")
+                .AllowCredentials();
             });
 });
 
@@ -57,7 +58,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                 builder.Configuration.GetSection("AppSettings:Token").Value!)),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(3)
         };
     });
 

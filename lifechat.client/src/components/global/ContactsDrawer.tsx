@@ -4,7 +4,7 @@ import { Box, colors, Drawer, IconButton, Typography } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import HttpClient from '../../utility/HttpClient';
+import HttpClient from '../../API/HttpClient';
 
 
 interface IDrawerProps {
@@ -30,7 +30,8 @@ export function ContactsDrawer (props: IDrawerProps) {
     const subscription = HttpClient.get(`${apiUrl}Channels`)
       .subscribe({
         next(response) {
-          setChannels(response)
+          if(response !== undefined)
+            setChannels(response)
         },
         error(err: Error) { console.error(err.message)},
         complete() {
@@ -77,17 +78,19 @@ export function ContactsDrawer (props: IDrawerProps) {
         <Box display="flex" flexDirection="column" alignItems="flex-start" paddingY="1vh" paddingLeft="0.5vw" height="100%" bgcolor={theme.palette.background.default}>
           { 
             channels.map((channel) => (
-              <Typography onClick={() => {console.log(channel.name)}}
-               variant="h5" width="95%" minHeight="3vh" paddingLeft="1vw" paddingTop="1vh" display="flex"
-               sx={{
-                borderBottom: "solid",
-                transition: "background-color 0.2s ease-out",
-                ':hover': {
-                  bgcolor: theme.palette.background.default
-                }
-              }}>
-                  {channel.name}
-              </Typography>
+              <Box width="95%" minHeight="3vh" paddingLeft="1vw" paddingTop="1vh" display="flex"
+                sx={{
+                  borderBottom: "solid",
+                  transition: "background-color 0.2s ease-out",
+                  ':hover': {
+                    bgcolor: theme.palette.background.dark,
+                  }
+                }}>              
+                <Typography onClick={() => {console.log(channel.name)}}
+                  variant="h5">
+                    {channel.name}
+                </Typography>
+              </Box>
             ))
           }
           

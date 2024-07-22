@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Theme, useTheme } from "@mui/material";
 import { useDispatch, useSelector,  } from "react-redux";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { sendToConnection, setConnector } from "../store/slices/ConnectorSlice";
 import { SignalConnector } from "../API/SignalConnector";
@@ -9,23 +9,34 @@ import { ContactsDrawer } from "../components/global/ContactsDrawer";
 import { SendSharp } from "@mui/icons-material";
 import Interceptors from "../API/Interceptors";
 import { setLoggedIn, setToken, setUsername } from "../store/slices/UserSlice";
-import HttpClient from "../utility/HttpClient";
+import HttpClient from "../API/HttpClient";
 
 function MainPage() {
 
     const theme: Theme = useTheme()
     const dispatch = useDispatch()
-    const username = useSelector(state => state.user.username)
+    const isLogged = useSelector(state => state.user.loggedIn)
+    const reroute = useNavigate()
     
     useEffect(() => {
+        const signalConnector = new SignalConnector()
+        dispatch(setConnector(signalConnector))
+        console.log("set connector");
+
         const token = localStorage.getItem("token")
-        if(token && !username) {
+        console.log(token && !isLogged);
+        if(token && !isLogged) {
             dispatch(setToken(token))
-            Interceptors.addAuthInterceptor("token")
+            console.log("setting stuff");
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
                     next(response) {
+                        console.log(`mainpage response`)
+                        console.log(response);
                         dispatch(setUsername(response.username))
+                        dispatch(setToken(token))
+                        dispatch(setLoggedIn(true))
+                        localStorage.setItem("token", token)
                     },
                     error(err) {
                         console.error(err.message)
@@ -33,13 +44,15 @@ function MainPage() {
                     complete() {
                         subscription.unsubscribe()
                         dispatch(setLoggedIn(true))
+                        Interceptors.addAuthInterceptor()
                     }
                 })
         }
-        const signalConnector = new SignalConnector()
-        dispatch(setConnector(signalConnector))
-        Interceptors.addAuthInterceptor()
-
+        else if (!token){
+            reroute("/")
+            return
+        }
+        // HttpClient.listInterceptors()
     },[])
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false)
