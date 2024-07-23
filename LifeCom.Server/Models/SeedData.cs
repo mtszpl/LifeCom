@@ -2,6 +2,7 @@
 using LifeCom.Server.Chats.Channels;
 using LifeCom.Server.Chats.Messages;
 using LifeCom.Server.Data;
+using LifeCom.Server.Hubs;
 using LifeCom.Server.Users;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,7 +10,7 @@ namespace LifeCom.Server.Models
 {
     public class SeedData
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static async Task Initialize(IServiceProvider serviceProvider)
         {
             using(LifeComContext context = new LifeComContext(serviceProvider.GetRequiredService<DbContextOptions<LifeComContext>>())) 
             {
@@ -46,6 +47,7 @@ namespace LifeCom.Server.Models
                     email = "kimi.raikkonen@alfa.ch"
                 };
 
+
                 if (!context.Chat.Any())                 
                     context.Chat.AddRange(ferrariChat, theOtherChat);
                 
@@ -76,7 +78,9 @@ namespace LifeCom.Server.Models
 
                 if (!context.Users.Any())                
                     context.Users.AddRange(charles, carlos, kimi);
-                
+
+                //await chatHub.Groups.AddToGroupAsync(charles.Id.ToString(), driversChannel.Name);
+                //await chatHub.Groups.AddToGroupAsync(carlos.Id.ToString(), driversChannel.Name);
 
                 context.SaveChanges();
             }
