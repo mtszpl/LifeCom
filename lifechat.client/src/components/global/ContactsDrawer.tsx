@@ -5,6 +5,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import HttpClient from '../../API/HttpClient';
+import Channel from '../../model/Channel';
 
 
 interface IDrawerProps {
@@ -13,6 +14,7 @@ interface IDrawerProps {
   height?: number
   transitionTime? : number
   handleClose?: (newState: boolean) => void
+  handleChannelSelect?: (channel: Channel) => void
 }
 
 export function ContactsDrawer (props: IDrawerProps) {
@@ -20,7 +22,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   const theme = useTheme()
 
   const apiUrl: string = "https://localhost:7078/api/"
-  const [channels, setChannels] = useState([])
+  const [channels, setChannels] = useState<Channel[]>([])
 
   const isLoggedIn: boolean = useSelector(state => state.user.loggedIn)
 
@@ -39,7 +41,6 @@ export function ContactsDrawer (props: IDrawerProps) {
         }
       })
   }, [isLoggedIn])
-  
   
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
@@ -77,16 +78,18 @@ export function ContactsDrawer (props: IDrawerProps) {
         </Box>
         <Box display="flex" flexDirection="column" alignItems="flex-start" paddingY="1vh" paddingLeft="0.5vw" height="100%" bgcolor={theme.palette.background.default}>
           { 
-            channels.map((channel) => (
-              <Box width="95%" minHeight="3vh" paddingLeft="1vw" paddingTop="1vh" display="flex"
+            channels.map((channel, idx) => (
+              <Box key={idx} width="95%" minHeight="3vh" paddingLeft="1vw" paddingTop="1vh" display="flex"
                 sx={{
                   borderBottom: "solid",
                   transition: "background-color 0.2s ease-out",
                   ':hover': {
                     bgcolor: theme.palette.background.dark,
                   }
-                }}>              
-                <Typography onClick={() => {console.log(channel.name)}}
+                }}
+                onClick={() => props.handleChannelSelect?.(channel)}
+                >              
+                <Typography
                   variant="h5">
                     {channel.name}
                 </Typography>
