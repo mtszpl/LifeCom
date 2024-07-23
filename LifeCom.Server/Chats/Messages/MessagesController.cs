@@ -9,6 +9,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Users;
+using LifeCom.Server.Hubs;
+using LifeCom.Server.Chats.Channels;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LifeCom.Server.Chats.Messages
 {
@@ -17,16 +20,22 @@ namespace LifeCom.Server.Chats.Messages
     public class MessagesController : Controller
     {
         private readonly LifeComContext _context;
+        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        private readonly UserService _userService;
+        private readonly ChannelService _channelService;
+        public MessagesController(LifeComContext context, IHubContext<ChatHub, IChatClient> hubContext)
+        {
+            _context = context;
+            _hubContext = hubContext;
+            _userService = new UserService(context);
+            _channelService = new ChannelService(context);
+        }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
         }
 
-        public MessagesController(LifeComContext context)
-        {
-            _context = context;
-        }
 
         // GET: Messages
         [NonAction]
@@ -36,6 +45,15 @@ namespace LifeCom.Server.Chats.Messages
         }
 
         [HttpGet]
+        public ActionResult<List<Message>> GetByChannelId(int id)
+        {
+            List<Message> messages = _context.Message.Where(msg => msg.channelId == id).Include(msg => msg.author).ToList();
+            messages.OrderByDescending(msg => msg.timestamp).ToList();
+            return Ok(messages);
+        }
+
+        //[HttpGet]
+        [NonAction]
         public async Task<List<Message>> Read()
         {
             ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
@@ -52,8 +70,46 @@ namespace LifeCom.Server.Chats.Messages
                 .ToListAsync();
         }
 
-        [HttpGet]
-        [Route("read")]
+        [HttpPost]
+        public async Task<ActionResult<Message>> SendMessage([FromBody]MessageRequest messageRequest)
+        {
+            if (messageRequest.content == string.Empty || messageRequest.channelId == null)            
+                return BadRequest("Content missing");
+            
+            Console.WriteLine(messageRequest);
+
+            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null)
+                throw new InvalidOperationException("Unidentified user");
+
+            int? id = int.Parse(identity.FindFirst("id").Value);
+            if(!id.HasValue)
+                return NotFound("User not found");
+
+            User? author = _userService.GetById(id);
+            if (author == null)
+                return NotFound("User not found");
+            Channel? channel = _channelService.GetById(messageRequest.channelId);
+            if (channel == null)
+                return NotFound("Channel not found");
+
+            Message message = new Message
+            {
+                content = messageRequest.content,
+                author = null,
+                authorId = author.Id,
+                channel = null,
+                channelId = channel.Id
+            };
+            await _context.Message.AddAsync(message);
+            //await _context.SaveChangesAsync();
+
+            await _hubContext.Clients.Group(channel!.Id.ToString()).ReceiveMessage(author, message.content);
+
+            return Ok(message);
+        }
+
+        [HttpGet("read")]
         public Task<List<Message>> ReadChatMessages(int chatId)
         {
             var identity = HttpContext.User.Identity as ClaimsIdentity;

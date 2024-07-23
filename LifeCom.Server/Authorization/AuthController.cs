@@ -114,6 +114,47 @@ namespace LifeCom.Server.Authorization
             return Ok(response);
         }
 
+        [HttpGet("login")]
+        public ActionResult<AuthResponse> Login()
+        {
+            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null)
+                return Forbid("Unauthorized");
+            int? id = int.Parse(identity.FindFirst("id").Value);
+            if (id == null)
+                return Forbid("Unathorized");
+            User? searchedUser = searchedUser = _context.Users
+                .SingleOrDefault(user => user.Id == id);
+
+            if (searchedUser == null)
+                return BadRequest("User not found");
+
+            string refresh = GenerateRefreshToken();
+            searchedUser.refreshToken = refresh;
+            searchedUser.refreshExpirationTime = DateTime.UtcNow.AddDays(7);
+            _context.SaveChanges();
+
+            Response.Cookies.Delete("fresh");
+
+            Response.Cookies.Append("fresh", refresh, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = searchedUser.refreshExpirationTime,
+                SameSite = SameSiteMode.None,
+                IsEssential = true
+            });
+
+            AuthResponse response = new AuthResponse
+            {
+                username = searchedUser.username,
+                token = CreateToken(searchedUser),
+                refreshToken = refresh
+            };
+
+            return Ok(response);
+        }
+
         [HttpGet("refresh")]
         public ActionResult<string> Refresh()
         {
@@ -141,7 +182,7 @@ namespace LifeCom.Server.Authorization
 
             JwtSecurityToken token = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(10),
+                    expires: DateTime.Now.AddSeconds(10),
                     signingCredentials: cred
                 );
 

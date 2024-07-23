@@ -11,6 +11,16 @@ namespace LifeCom.Server.Data
         public LifeComContext (DbContextOptions<LifeComContext> options) : base(options) 
         { }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.channels)
+                .WithMany(e => e.members)
+                .UsingEntity<UserChannel>(
+                );
+        }
+
         public DbSet<User> Users { get; set; }
         public bool AddUser(User newUser) 
         {
