@@ -89,22 +89,17 @@ namespace LifeCom.Server.Chats.Messages
             User? author = _userService.GetById(id);
             if (author == null)
                 return NotFound("User not found");
-            Channel? channel = _channelService.GetById(messageRequest.channelId);
-            if (channel == null)
-                return NotFound("Channel not found");
 
             Message message = new Message
             {
                 content = messageRequest.content,
-                author = null,
                 authorId = author.Id,
-                channel = null,
-                channelId = channel.Id
+                channelId = messageRequest.channelId
             };
             await _context.Message.AddAsync(message);
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            await _hubContext.Clients.Group(channel!.Id.ToString()).ReceiveMessage(author, message.content);
+            await _hubContext.Clients.Group(messageRequest.channelId.ToString()).ReceiveMessage(new UserResponse(author), messageRequest.content);
 
             return Ok(message);
         }

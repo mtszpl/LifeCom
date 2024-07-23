@@ -62,7 +62,7 @@ namespace LifeCom.Server.Hubs
 
         public async Task SendMessage(User author, string message){
 
-            await Clients.All.ReceiveMessage(author, message);
+            await Clients.All.ReceiveMessage(new UserResponse(author), message);
         }
     }
 }

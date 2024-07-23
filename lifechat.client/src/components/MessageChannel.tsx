@@ -6,7 +6,7 @@ import Message from '../model/Message';
 import HttpClient from '../API/HttpClient';
 import { MessageBox } from './MessageBox';
 import { useDispatch, useSelector } from 'react-redux';
-import { sendToConnection } from '../store/slices/ConnectorSlice';
+import { SignalConnector } from '../API/SignalConnector';
 
 export interface IMessageChannelProps {
     contentOffset: number,
@@ -17,20 +17,23 @@ export interface IMessageChannelProps {
 export function MessageChannel (props: IMessageChannelProps) {
     const theme: Theme = useTheme()
     const [messages, setMessages] = useState<Message[]>([])
-    const connector = useSelector(store => store.connector)
-    const dispatch = useDispatch()
+    const connector: SignalConnector = useSelector(store => store.connector.connector)
 
     const [content, setContent] = useState<string>("")
 
     const messageUrl: string = "https://localhost:7078/api/Messages"
 
     useEffect(() => {
-        console.log(props.channel.id);
-        HttpClient.get(`${messageUrl}?id=${props.channel.id}`)
-            .subscribe((data) => {
-                setMessages(data)
-            })
+        getMessages()
+        connector.onReceiveMessage(getMessages)
     }, [])
+
+    const getMessages = () => {
+        HttpClient.get(`${messageUrl}?id=${props.channel.id}`)
+        .subscribe((data) => {
+            setMessages(data)
+        })
+    }
 
     const handleMessageTyping = (e) => {
         setContent(e.target.value)
