@@ -11,7 +11,7 @@ namespace LifeCom.Server.Chats.Messages
         public DateTime timestamp { get; set; } = DateTime.UtcNow;
 
         public required int channelId { get; set; }
-        public Channel channel { get; set; } = null!;
+        public required Channel channel { get; set; } = null!;
         public required int authorId { get; set; }
         public required User author { get; set; } = null!;
 

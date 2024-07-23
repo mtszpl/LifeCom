@@ -15,11 +15,11 @@ namespace LifeCom.Server.Users
     [Authorize]
     public class UsersController : Controller
     {
-        private readonly LifeComContext _context;
+        private readonly UserService _userService;
 
         public UsersController(LifeComContext context)
         {
-            _context = context;
+            _userService = new UserService(context);
         }
 
         [HttpGet]
@@ -27,16 +27,17 @@ namespace LifeCom.Server.Users
         {
             ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity == null)
-                return Forbid("Unauthorized");
+                return StatusCode(403);
+            string authHeader = Request.Headers["Authorization"].ToString();
             string? idString = identity.FindFirst("id")?.Value;
             if (idString == null)
-                return Forbid("Unathorized");
+                return Forbid();
             int userId = int.Parse(idString);
             string? token = Request.Headers.FirstOrDefault(h => h.Key == "Authorization").Value;
             if (token == null)
                 return Forbid();
             token = token.Remove(0, "Bearer ".Length);
-            User user = _context.Users.FirstOrDefault(user => user.Id == userId);
+            User? user = _userService.GetById(userId);
             if (user == null)
                 return BadRequest("User ID not found");
 
@@ -61,8 +62,7 @@ namespace LifeCom.Server.Users
             {
                 try
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    await _userService.Update(user);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -89,8 +89,7 @@ namespace LifeCom.Server.Users
                 return NotFound();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var user = await _userService.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound();
@@ -104,19 +103,18 @@ namespace LifeCom.Server.Users
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _userService.FindAsync(id);
             if (user != null)
             {
-                _context.Users.Remove(user);
+                await _userService.Remove(user);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UserExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _userService.UserExists(id);
         }
     }
 }

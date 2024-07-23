@@ -15,11 +15,11 @@ namespace LifeCom.Server.Chats.Channels
     [Authorize]
     public class ChannelsController : Controller
     {
-        private readonly LifeComContext _context;
+        private readonly ChannelService _channelService;
 
         public ChannelsController(LifeComContext context)
         {
-            _context = context;
+            _channelService = new ChannelService(context);
         }
 
         // GET: Channels
@@ -40,7 +40,7 @@ namespace LifeCom.Server.Chats.Channels
                 return Forbid("Unathorized");
             int userId = int.Parse(idString);
 
-            return _context.Channel.Where(channel => channel.members.Any(member => member.Id == userId)).ToList();
+            return _channelService.GetChannelsOfUserById(userId);
         }
 
         // POST: Channels/Create
@@ -61,43 +61,32 @@ namespace LifeCom.Server.Chats.Channels
         //}
 
         // GET: Channels/Delete/5
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete]
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var channel = await _context.Channel
-                .Include(c => c.chat)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (channel == null)
-            {
-                return NotFound();
-            }
+        //    var channel = await _context.Channel
+        //        .Include(c => c.chat)
+        //        .FirstOrDefaultAsync(m => m.Id == id);
+        //    if (channel == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(channel);
-        }
+        //    return View(channel);
+        //}
 
         // POST: Channels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var channel = await _context.Channel.FindAsync(id);
-            if (channel != null)
-            {
-                _context.Channel.Remove(channel);
-            }
-
-            await _context.SaveChangesAsync();
+            await _channelService.RemoveById(id);
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ChannelExists(int id)
-        {
-            return _context.Channel.Any(e => e.Id == id);
         }
     }
 }
