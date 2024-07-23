@@ -25,8 +25,6 @@ export function Topbar (props: ITopbarProps) {
     const stateUser = useSelector(state => state.user)
     const [localUser, setLocalUser] = useState(stateUser)
     useEffect(() => {
-      console.log(`stateUser`);
-      console.log(stateUser);
       setLocalUser(stateUser)
     }, [stateUser])
 

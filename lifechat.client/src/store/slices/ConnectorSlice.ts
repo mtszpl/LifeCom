@@ -15,7 +15,7 @@ export const connectorSlice = createSlice({
             console.log(action.payload);
             if(state.connector != undefined)
                 state.connector.sendMessage(action.payload)
-        } 
+        }
     }
 })
 

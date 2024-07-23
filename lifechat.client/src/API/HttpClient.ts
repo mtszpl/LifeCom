@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios"
-import { first, from, map } from "rxjs"
+import { from } from "rxjs"
 
 /**
  * Class used for executing API calls and returning data as RxJs observable
@@ -24,7 +25,7 @@ export default class HttpClient {
      * @param errorHandle Error handle function
      * @returns 
      */
-    static addRequestInterceptor = (interceptor: (response) => any, errorHandle?: (error) => any = undefined) => {
+    static addRequestInterceptor = (interceptor: (response: any) => any, errorHandle?: (error: any) => any) => {
         return HttpClient.API.interceptors.request.use(interceptor, errorHandle)
     }
 
@@ -34,7 +35,7 @@ export default class HttpClient {
      * @param errorHandle Error handle function
      * @returns 
      */
-    static addResponseInterceptor = (interceptor: (response) => any, errorHandle?: (error) => any = undefined) => {
+    static addResponseInterceptor = (interceptor: (response: any) => any, errorHandle?: (error: any) => any) => {
         return HttpClient.API.interceptors.response.use(interceptor, errorHandle)
     }
 
@@ -42,21 +43,19 @@ export default class HttpClient {
      * Removes request interceptor from API calls
      * @param interceptor Interceptor to remove
      */
-    static removeRequestInterceptor = (interceptor) => {
+    static removeRequestInterceptor = (interceptor: number) => {
         HttpClient.API.interceptors.request.eject(interceptor)
-        console.log(`Request interceptors: ${HttpClient.API.interceptors.request.handles}`);
     }
     
     /**
      * Removes response interceptor from API calls
      * @param interceptor Interceptor to remove
     */
-   static removeResponseInterceptor = (interceptor) => {
+   static removeResponseInterceptor = (interceptor:number) => {
        HttpClient.API.interceptors.response.eject(interceptor)
-       console.log(`Response interceptors: ${HttpClient.API.interceptors.response.handles}`);
     }
 
-    static request (request) {
+    static request (request: Promise<any>) {
         return from(request)
     }
 
@@ -68,7 +67,6 @@ export default class HttpClient {
      */
     static get = (url: string, params: any = undefined) => {     
         const axiosPromise = HttpClient.API.get(url, {withCredentials: true})
-
         return from(axiosPromise.then(response => {
             return response.data
         }).catch(error => {
@@ -87,11 +85,10 @@ export default class HttpClient {
      * @param contentType Content type of request, default application/json
      * @returns Observable with data from call or error message if occured
      */
-    static post = (url: string, payload: unknown, params: unknown = undefined, contentType: string = "application/json") => {
+    static post = (url: string, payload: unknown, params: any = undefined, contentType: string = "application/json") => {
         const axiosPromise = HttpClient.API.post(url, payload, {withCredentials: true})
         console.log("post");
         return from(axiosPromise.then(response => {
-            console.log(response);
             return response.data;
         }).catch(error => {
             if (error.response) {
