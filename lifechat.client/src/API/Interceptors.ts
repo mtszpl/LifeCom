@@ -29,14 +29,11 @@ export default class Inteceptors {
             token = localStorage.getItem(key)
         else
             token = store.getState().user.token
-        console.log(token);
         this.authInterceptor = HttpClient.addRequestInterceptor((config) => {
-            console.log("intercepting");
             if(this.authUrls.some(url => config.url.includes(url)))
                 return config
             if(token)
                 config.headers.Authorization = `Bearer ${token}`
-            console.log(config);
             return config
         })
 
@@ -65,25 +62,25 @@ export default class Inteceptors {
         }, async error => {
             const { config, response: { status } } = error;
             const originalRequest = config;
-
             if(this.refreshUrl.some(url => error.config.url.includes(url)))
                 return
-            if(error.response.status === 401 && !originalRequest._retry) {   
+            if((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {   
                 originalRequest._retry = true
                 const token = store.getState().user.token
                 
                 try{
-
+                    
                     const refreshResponse = await axios.get("https://localhost:7078/api/Auth/refresh", {
                         headers: {
                             "Authorization": `Bearer ${token}`
                         },
                         withCredentials: true
                     })
-                    
+                                        
                     const newToken = refreshResponse.data
                     originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-                    
+                    localStorage.setItem("token", newToken)
+                    store.dispatch({ type: 'user/setToken', payload: newToken})
                     const retryApi = axios.create({
                         baseURL: error.config.url,
                         withCredentials: true
