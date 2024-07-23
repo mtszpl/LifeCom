@@ -51,10 +51,16 @@ export function Topbar (props: ITopbarProps) {
             <IconButton sx={{ color: colors.white[200], marginX: "0.5vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
               <MenuIcon fontSize='large'/>
             </IconButton>
-            <img src={logo}  width="5%" color={colors.white[100]}/>
-            <Typography variant='h3' color={colors.white[200]} ml="2vh">
-              LifeCom
-            </Typography>
+            <Box display="flex" alignItems="center" onClick={() => navigate("/")}
+                sx={{
+                  cursor: "pointer"
+                }}
+              >
+              <img src={logo}  width="5%" color={colors.white[100]}/>
+              <Typography variant='h3' color={colors.white[200]} ml="2vh">
+                LifeCom
+              </Typography>
+            </Box>
           </Box>
           <span/>
           <Box display="flex" alignItems="center">

@@ -1,23 +1,21 @@
 import { SendSharp } from '@mui/icons-material';
 import { Box, TextField, Button, useTheme } from '@mui/material';
-import Channel from '../model/Channel';
 import { useEffect, useState } from 'react';
 import Message from '../model/Message';
 import HttpClient from '../API/HttpClient';
 import { MessageBox } from './MessageBox';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { SignalConnector } from '../API/SignalConnector';
+import { useParams } from 'react-router-dom';
 
 export interface IMessageChannelProps {
-    contentOffset: number,
-    drawerTransitionTime: number
-    channel: Channel
 }
 
 export function MessageChannel (props: IMessageChannelProps) {
     const theme: Theme = useTheme()
     const [messages, setMessages] = useState<Message[]>([])
     const connector: SignalConnector = useSelector(store => store.connector.connector)
+    const { id } = useParams()
 
     const [content, setContent] = useState<string>("")
 
@@ -26,10 +24,12 @@ export function MessageChannel (props: IMessageChannelProps) {
     useEffect(() => {
         getMessages()
         connector.onReceiveMessage(getMessages)
+        console.log("channel id");
+        console.log(id);
     }, [])
 
     const getMessages = () => {
-        HttpClient.get(`${messageUrl}?id=${props.channel.id}`)
+        HttpClient.get(`${messageUrl}?id=${id}`)
         .subscribe((data) => {
             setMessages(data)
         })
@@ -45,7 +45,7 @@ export function MessageChannel (props: IMessageChannelProps) {
             return
         const message: Message = new Message()
         message.content = content
-        message.channelId = props.channel.id
+        message.channelId = id
         console.log(message);
         HttpClient.post(messageUrl, message)
         // dispatch(sendToConnection(content))

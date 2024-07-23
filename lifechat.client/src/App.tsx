@@ -9,6 +9,8 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { LandingPage } from './pages/LandingPage';
 import { useEffect } from 'react';
+import { MainDefault } from './components/MainDefault';
+import { MessageChannel } from './components/MessageChannel';
 
 function App() {
     const [theme, colorMode] = useMode()
@@ -28,7 +30,11 @@ function App() {
                     <Provider store={store}>
                         <Routes>
                             <Route path="/" element={<LandingPage/>}/>
-                            <Route path="/main/*" element={<MainPage/>}/>
+                            <Route path="/main" element={<MainPage/>}>
+                                <Route index element={<MainDefault/>}/>
+                                <Route path=":username"/>
+                                <Route path="channel/:id" element={<MessageChannel/>}/>
+                            </Route>
                             <Route path="/login" element={
                                 condition ? <LoginPage/> : <Navigate to={"/"}/>
                             }/>

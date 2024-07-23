@@ -1,6 +1,6 @@
 import { Box, Theme, useTheme } from "@mui/material";
 import { useDispatch, useSelector,  } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { setConnector } from "../store/slices/ConnectorSlice";
 import { SignalConnector }  from "../API/SignalConnector";
@@ -61,8 +61,6 @@ function MainPage() {
     const [contentOffset, setContentOffset] = useState<number>(0)
     const drawerWidth: number = 20
     const drawerTransitionTime: number = 400
-    const defaultContent = <MainDefault/>
-    const [mainContent, setMainContent] = useState(defaultContent)
 
 
     useEffect(() => {
@@ -76,10 +74,6 @@ function MainPage() {
     
     const updateDrawer = (newState: boolean) => {
         setDrawerOpen(newState)
-    }
-
-    const selectChannel = (channel: Channel) => {
-        setMainContent(<MessageChannel drawerTransitionTime={drawerTransitionTime} contentOffset={contentOffset} channel={channel}/>)
     }
 
     return (
@@ -97,12 +91,10 @@ function MainPage() {
                  open={drawerOpen}
                  width={drawerWidth}
                  transitionTime={drawerTransitionTime}
-                 handleClose={updateDrawer}
-                 handleChannelSelect={selectChannel}>
-            </ContactsDrawer>
-            <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}></Topbar>
+                 handleClose={updateDrawer}/>
+            <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/>
             <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
-                {mainContent}
+                <Outlet/>
             </Box>
 
         </Box>
