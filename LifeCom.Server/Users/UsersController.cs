@@ -23,7 +23,7 @@ namespace LifeCom.Server.Users
         }
 
         [HttpGet]
-        public ActionResult<string> GetUsername() 
+        public ActionResult<UserResponse> GetSelf() 
         {
             ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity == null)
@@ -40,8 +40,8 @@ namespace LifeCom.Server.Users
             User? user = _userService.GetById(userId);
             if (user == null)
                 return BadRequest("User ID not found");
-
-            return Ok(user.username);
+            UserResponse response = new UserResponse(user);
+            return Ok(response);
         }
 
 
