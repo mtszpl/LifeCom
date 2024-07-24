@@ -13,9 +13,14 @@ namespace LifeCom.Server.Chats.Channels
             _context = context;
         }
 
-        public List<Channel> GetChannelsOfUserById(int? userId)
+        public List<Channel> GetOfUserById(int? userId)
         {
             return _context.Channel.Where(channel => channel.members.Any(member => member.Id == userId)).ToList();
+        }
+
+        public List<Channel> GetByChat(int chatId)
+        {
+            return _context.Channel.Where(ch => ch.chatId == chatId).ToList();
         }
 
         public Task<Channel?> GetByIdAsync(int? id)

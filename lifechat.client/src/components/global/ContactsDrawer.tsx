@@ -27,7 +27,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   const apiUrl: string = "https://localhost:7078/api/"
   const [channels, setChannels] = useState<Channel[]>([])
   const [chats, setChats] = useState<Chat[]>([])
-  const [selectedChat, selectChat] = useState<string>("None")
+  const [selectedChat, selectChat] = useState<Chat | undefined>(undefined)
 
   const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
   const navigate = useNavigate()
@@ -35,22 +35,44 @@ export function ContactsDrawer (props: IDrawerProps) {
   useEffect(() => {
     if(!isLoggedIn)
       return
-    const subscription = HttpClient.get(`${apiUrl}Channels`)
-      .subscribe({
+    const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
+      .subscribe(({
         next(response) {
-          if(response !== undefined)
-            setChannels(response)
+          setChats([...response])
         },
-        error(err: Error) { console.error(err.message)},
-        complete() {
-          subscription.unsubscribe()
+        error(err: Error) { console.error(err.message) },
+        complete(){
+          chatSubscription.unsubscribe()
         }
-      })
-  }, [isLoggedIn])
-  
+      }))
+  }, [isLoggedIn])  
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
   useEffect(() => setDrawerOpen(props.open), [props.open])
+
+  useEffect(() => {
+    console.log(selectedChat);
+    if(selectedChat === undefined){
+      setChannels([])
+      navigate("")
+    }
+    else
+      getChannels(selectedChat.id)
+  }, [selectedChat])
+
+  const getChannels = (chatId: number) => {
+    const channelsSubscription = HttpClient.get(`${apiUrl}Channels?channelId=${chatId}`)
+    .subscribe({
+      next(response) {
+        if(response !== undefined)
+          setChannels(response)
+      },
+      error(err: Error) { console.error(err.message)},
+      complete() {
+        channelsSubscription.unsubscribe()
+      }
+    })
+  }
 
   const toggleOpen = () => {
     setDrawerOpen(!drawerOpen)
@@ -58,10 +80,17 @@ export function ContactsDrawer (props: IDrawerProps) {
       props.handleClose(!drawerOpen)
   }
 
-  function handleChannelSelect(channel: Channel) {
+  const handleChannelSelect = (channel: Channel) => {
     navigate(`channel/${channel.id}`)    
   }
-
+  
+  const handleChatSelect = (e: SelectChangeEvent) => {
+    if(typeof e.target.value === 'string')
+      selectChat(undefined)
+    else 
+      selectChat(e.target.value)
+  }
+  
   const header = () => {
     return (
       <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.background.dark}>
@@ -73,10 +102,6 @@ export function ContactsDrawer (props: IDrawerProps) {
       </IconButton>
     </Box>
     )
-  }
-
-  const handleChatSelect = (e: SelectChangeEvent) => {
-    console.log(e);
   }
 
   const chatSelect = () => {
@@ -94,8 +119,12 @@ export function ContactsDrawer (props: IDrawerProps) {
               marginBottom: "1vh",
               color: theme.palette.secondary.main
             }}>
-            <MenuItem value="None">None</MenuItem>
-            <MenuItem>Chats</MenuItem>
+              <MenuItem value="None">None</MenuItem>
+              {
+                chats.map((chat, idx) => (
+                  <MenuItem value={chat} key={idx}>{chat.name}</MenuItem>
+                ))
+              }
           </Select>
         </Box>
       </FormControl>

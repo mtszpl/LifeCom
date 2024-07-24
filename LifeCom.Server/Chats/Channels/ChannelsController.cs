@@ -41,7 +41,18 @@ namespace LifeCom.Server.Chats.Channels
                 return Forbid("Unathorized");
             int userId = int.Parse(idString);
 
-            return _channelService.GetChannelsOfUserById(userId);
+            return _channelService.GetOfUserById(userId);
+        }
+
+        [HttpGet("bychat")]
+        public ActionResult<List<Channel>> GetByChannel(int chatId)
+        {
+            ClaimsIdentity? identity = HttpContext.User.Identities as ClaimsIdentity;
+            if (identity == null)
+                return Forbid("Unauthorized");
+
+            List<Channel> channels = _channelService.GetByChat(chatId);
+            return channels;
         }
 
         [HttpPost("user")]
