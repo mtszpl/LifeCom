@@ -4,6 +4,7 @@ using LifeCom.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LifeCom.Server.Migrations
 {
     [DbContext(typeof(LifeComContext))]
-    partial class LifeComContextModelSnapshot : ModelSnapshot
+    [Migration("20240723231036_add-roles2")]
+    partial class addroles2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,9 +117,9 @@ namespace LifeCom.Server.Migrations
                     b.Property<int>("userId")
                         .HasColumnType("int");
 
-                    b.Property<string>("role")
+                    b.Property<int?>("role")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("nvarchar(max)")
+                        .HasColumnType("int")
                         .HasDefaultValueSql("USER");
 
                     b.HasKey("chatId", "userId");
