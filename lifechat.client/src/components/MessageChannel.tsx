@@ -1,12 +1,13 @@
-import { SendSharp } from '@mui/icons-material';
 import { Box, TextField, Button, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Message from '../model/Message';
+import User from '../model/User';
 import HttpClient from '../API/HttpClient';
 import { MessageBox } from './MessageBox';
 import { useSelector } from 'react-redux';
 import { SignalConnector } from '../API/SignalConnector';
 import { useParams } from 'react-router-dom';
+import { SendSharp } from '@mui/icons-material';
 
 export interface IMessageChannelProps {
 }
@@ -16,7 +17,7 @@ export function MessageChannel (props: IMessageChannelProps) {
 
     const theme: Theme = useTheme()
     const [messages, setMessages] = useState<Message[]>([])
-    const connector = useSelector(state => state.connectorContainer.connector)
+    const connector: SignalConnector = useSelector(state => state.connectorContainer.connector)
 
     const [content, setContent] = useState<string>("")
 
@@ -24,7 +25,7 @@ export function MessageChannel (props: IMessageChannelProps) {
 
     useEffect(() => {
         getMessages()
-    }, [])
+    }, [id])
 
     useEffect(() => {
         if(connector !== undefined)
@@ -35,7 +36,6 @@ export function MessageChannel (props: IMessageChannelProps) {
     const getMessages = () => {
         HttpClient.get(`${messageUrl}?id=${id}`)
         .subscribe((data) => {
-            console.log(data);
             setMessages(data)
         })
     }
@@ -55,16 +55,16 @@ export function MessageChannel (props: IMessageChannelProps) {
         setContent("")
         HttpClient.post(messageUrl, message)
     }
-    
+
 
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%">   
-        <Box display="flex" flexDirection="column" height="100%" gap="1vh" marginY="2vh" bgcolor={theme.palette.background.light}>
+        <Box display="flex" flexDirection="column" height="100%" gap="1vh" marginY="2vh" overflow="auto" bgcolor={theme.palette.background.light}>
             {
                 messages.map((msg, idx) => (
                     <MessageBox message={msg} key={idx}/>
                 ))
-            }
+            }            
         </Box>
         <Box component="form" onSubmit={(e) => send(e)} marginTop="auto" display="flex" marginX="1vw" marginBottom="1vh" bgcolor={theme.palette.background.light} paddingTop="1vh">
             <TextField sx={{ width: "100%" }} value={content} onChange={e => handleMessageTyping(e)}/>
