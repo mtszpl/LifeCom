@@ -21,6 +21,11 @@ namespace LifeCom.Server.Models
                     Name = "drivers",
                     chat = ferrariChat
                 };
+                Channel formerDriversChannel = new Channel 
+                {
+                    Name = "former-drivers",
+                    chat = ferrariChat
+                };
                 User charles = new User
                 {
                     username = "Shaar",
@@ -44,16 +49,44 @@ namespace LifeCom.Server.Models
                     username = "KoolKimi",
                     password = "Bwoah1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("Bwoah1!"),
-                    email = "kimi.raikkonen@alfa.ch"
+                    email = "kimi.raikkonen@alfa.ch",
+                    chats = new List<Chat> { ferrariChat },
+                    channels = new List<Channel> { formerDriversChannel }
+                };       
+                User seb = new User
+                {
+                    username = "Seb",
+                    password = "Sbinalla1!",
+                    passwordHash = BCrypt.Net.BCrypt.HashPassword("Sbinalla1!"),
+                    email = "sebastian.vettel@astonmartin.uk",
+                    chats = new List<Chat> { ferrariChat },
+                    channels = new List<Channel> { formerDriversChannel }
                 };
-
+                User sbinotto = new User
+                {
+                    username = "Sbinotto",
+                    password = "ProntoLegreg1!",
+                    passwordHash = BCrypt.Net.BCrypt.HashPassword("ProntoLegreg1!"),
+                    email = "mattia.binotto@ferrari.it",
+                    chats = new List<Chat> { ferrariChat },
+                    channels = new List<Channel> { driversChannel, formerDriversChannel }
+                };
+                UserChat sbinottoChat = new UserChat
+                {
+                    user = sbinotto,
+                    chat = ferrariChat,
+                    role = UserChat.ERole.Admin.ToString()
+                };
 
                 if (!context.Chat.Any())                 
                     context.Chat.AddRange(ferrariChat, theOtherChat);
                 
 
                 if(!context.Channel.Any())                
-                    context.Channel.AddRange(driversChannel);                
+                    context.Channel.AddRange(driversChannel, formerDriversChannel);                
+
+                if (!context.UserChats.Any())
+                    context.UserChats.AddRange(sbinottoChat);
 
                 if (!context.Message.Any())
                 {
@@ -77,7 +110,7 @@ namespace LifeCom.Server.Models
                 }
 
                 if (!context.Users.Any())                
-                    context.Users.AddRange(charles, carlos, kimi);
+                    context.Users.AddRange(charles, carlos, kimi, seb);
 
                 //await chatHub.Groups.AddToGroupAsync(charles.Id.ToString(), driversChannel.Name);
                 //await chatHub.Groups.AddToGroupAsync(carlos.Id.ToString(), driversChannel.Name);

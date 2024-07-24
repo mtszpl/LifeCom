@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using LifeCom.Server.Users;
 
 namespace LifeCom.Server.Chats.Channels
 {
@@ -41,6 +42,27 @@ namespace LifeCom.Server.Chats.Channels
             int userId = int.Parse(idString);
 
             return _channelService.GetChannelsOfUserById(userId);
+        }
+
+        [HttpPost("user")]
+        [Authorize(Policy = "ChatAdmin")]
+        public void CreateChannel([FromBody]Chat chat, string name)
+        {
+
+        }
+
+        [HttpPost("add")]
+        [Authorize(Policy = "ChatAdmin")]
+        public void AddUser([FromBody]UserRequest user)
+        {
+
+        }
+
+        [HttpDelete("user")]
+        [Authorize(Policy = "ChatAdmin")]
+        public void DeleteUser([FromBody]UserRequest user) 
+        {
+
         }
 
         // POST: Channels/Create
