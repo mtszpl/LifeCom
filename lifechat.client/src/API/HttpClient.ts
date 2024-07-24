@@ -87,7 +87,6 @@ export default class HttpClient {
      */
     static post = (url: string, payload: unknown, params: any = undefined, contentType: string = "application/json") => {
         const axiosPromise = HttpClient.API.post(url, payload, {withCredentials: true})
-        console.log("post");
         return from(axiosPromise.then(response => {
             return response.data;
         }).catch(error => {

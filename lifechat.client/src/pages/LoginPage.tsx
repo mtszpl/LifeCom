@@ -68,17 +68,14 @@ export function LoginPage () {
       e.preventDefault()
       if(!e.target.checkValidity())
         return
-      console.log(rememberMe);
       if(rememberMe)
         localStorage.setItem("remember", "true")
       const payload = !isEmail(loginString) ?
       {username: loginString, password: password, email: null}
       : {username: null, password: password, email: loginString}
-      console.log("logging in");
       const subsciption = HttpClient.post(loginUrl, payload)
         .subscribe({
           next(response) {
-            console.log("logged in");
             LoginUtils.loginDetails(response)
           },
           error(err: Error) {
