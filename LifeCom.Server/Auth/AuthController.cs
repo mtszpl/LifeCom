@@ -63,10 +63,17 @@ namespace LifeCom.Server.Authorization
                 IsEssential = true
             });
 
+            string token = CreateToken(user);
             if (_context.AddUser(user))
             {
                 _context.SaveChanges();
-                return Ok(CreateToken(user));
+                AuthResponse response = new AuthResponse
+                {
+                    user = new UserResponse(user),
+                    token = token,
+                    refreshToken = user.refreshToken
+                };
+                return Ok(response);
             }
             return BadRequest("User already exists");
         }
@@ -106,7 +113,7 @@ namespace LifeCom.Server.Authorization
 
             AuthResponse response = new AuthResponse
             {
-                username = searchedUser.username,
+                user = new UserResponse(searchedUser),
                 token = CreateToken(searchedUser),
                 refreshToken = refresh
             };
@@ -147,7 +154,7 @@ namespace LifeCom.Server.Authorization
 
             AuthResponse response = new AuthResponse
             {
-                username = searchedUser.username,
+                user = new UserResponse(searchedUser),
                 token = CreateToken(searchedUser),
                 refreshToken = refresh
             };
