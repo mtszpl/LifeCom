@@ -4,8 +4,8 @@ import userReducer from "./slices/UserSlice";
 
 const store = configureStore({
     reducer: {
-        connector: connectionReducer,
-        user: userReducer
+        connectorContainer: connectionReducer,
+        userData: userReducer
     }
 })
 

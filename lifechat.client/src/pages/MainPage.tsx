@@ -7,18 +7,14 @@ import { SignalConnector }  from "../API/SignalConnector";
 import { Topbar } from "../components/global/Tobpar";
 import { ContactsDrawer } from "../components/global/ContactsDrawer";
 import Interceptors from "../API/Interceptors";
-import { setLoggedIn, setToken, setUsername } from "../store/slices/UserSlice";
+import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
 import HttpClient from "../API/HttpClient";
-import { MessageChannel } from "../components/MessageChannel";
-import { MainDefault } from "../components/MainDefault";
-import Channel from "../model/Channel";
-
 
 function MainPage() {
 
     const theme: Theme = useTheme()
     const dispatch = useDispatch()
-    const isLogged = useSelector(state => state.user.loggedIn)
+    const isLogged = useSelector(state => state.userData.loggedIn)
 
     const reroute = useNavigate()
     
@@ -40,8 +36,7 @@ function MainPage() {
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
                     next(response) {
-
-                        dispatch(setUsername(response))
+                        dispatch(setUser(response))
                         dispatch(setToken(token))
                         dispatch(setLoggedIn(true))
                         localStorage.setItem("token", token)
@@ -92,7 +87,7 @@ function MainPage() {
                  width={drawerWidth}
                  transitionTime={drawerTransitionTime}
                  handleClose={updateDrawer}/>
-            <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/>
+            <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
             <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
                 <Outlet/>
             </Box>

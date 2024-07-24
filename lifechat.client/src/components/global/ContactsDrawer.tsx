@@ -29,7 +29,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   const [chats, setChats] = useState<Chat[]>([])
   const [selectedChat, selectChat] = useState<string>("None")
 
-  const isLoggedIn: boolean = useSelector(state => state.user.loggedIn)
+  const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -76,7 +76,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   }
 
   const handleChatSelect = (e: SelectChangeEvent) => {
-
+    console.log(e);
   }
 
   const chatSelect = () => {
@@ -133,8 +133,7 @@ export function ContactsDrawer (props: IDrawerProps) {
                   }
                 }}
                 onClick={() => {
-                  handleChannelSelect(channel)
-                  props.handleChannelSelect?.(channel)
+                  handleChannelSelect(channel)                  
                 }}
                 >              
                 <Typography

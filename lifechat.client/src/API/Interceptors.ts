@@ -28,7 +28,7 @@ export default class Inteceptors {
         if(key)
             token = localStorage.getItem(key)
         else
-            token = store.getState().user.token
+            token = store.getState().userData.token
         this.authInterceptor = HttpClient.addRequestInterceptor((config) => {
             if(this.authUrls.some(url => config.url.includes(url)))
                 return config
@@ -66,7 +66,7 @@ export default class Inteceptors {
                 return
             if((error.response.status === 401 || error.response.status === 403) && !originalRequest._retry) {   
                 originalRequest._retry = true
-                const token = store.getState().user.token
+                const token = store.getState().userData.token
                 
                 try{
                     

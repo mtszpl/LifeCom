@@ -2,7 +2,7 @@ import User from "./User";
 import Channel from "./Channel";
 
 export default class Message {
-    author: User | null = null
+    author!: User
     content: string = ""
-    channelId: Channel | null = null
+    channelId!: Channel
 }

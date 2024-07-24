@@ -12,10 +12,11 @@ export interface IMessageChannelProps {
 }
 
 export function MessageChannel (props: IMessageChannelProps) {
+    const { id } = useParams()
+
     const theme: Theme = useTheme()
     const [messages, setMessages] = useState<Message[]>([])
-    const connector: SignalConnector = useSelector(store => store.connector.connector)
-    const { id } = useParams()
+    const connector = useSelector(state => state.connectorContainer.connector)
 
     const [content, setContent] = useState<string>("")
 
@@ -23,14 +24,18 @@ export function MessageChannel (props: IMessageChannelProps) {
 
     useEffect(() => {
         getMessages()
-        connector.onReceiveMessage(getMessages)
-        console.log("channel id");
-        console.log(id);
     }, [])
+
+    useEffect(() => {
+        if(connector !== undefined)
+            connector.onReceiveMessage(getMessages)
+        
+    }, [connector])    
 
     const getMessages = () => {
         HttpClient.get(`${messageUrl}?id=${id}`)
         .subscribe((data) => {
+            console.log(data);
             setMessages(data)
         })
     }
@@ -43,12 +48,12 @@ export function MessageChannel (props: IMessageChannelProps) {
         e.preventDefault()
         if(content === "")
             return
-        const message: Message = new Message()
-        message.content = content
-        message.channelId = id
-        console.log(message);
+        const message = {
+            content: content,
+            channelId: id
+        }
+        setContent("")
         HttpClient.post(messageUrl, message)
-        // dispatch(sendToConnection(content))
     }
     
 
@@ -56,13 +61,13 @@ export function MessageChannel (props: IMessageChannelProps) {
     <Box display="flex" flexDirection="column" height="100%" width="100%">   
         <Box display="flex" flexDirection="column" height="100%" gap="1vh" marginY="2vh" bgcolor={theme.palette.background.light}>
             {
-                messages.map(msg => (
-                    <MessageBox message={msg}/>
+                messages.map((msg, idx) => (
+                    <MessageBox message={msg} key={idx}/>
                 ))
             }
         </Box>
         <Box component="form" onSubmit={(e) => send(e)} marginTop="auto" display="flex" marginX="1vw" marginBottom="1vh" bgcolor={theme.palette.background.light} paddingTop="1vh">
-            <TextField sx={{ width: "100%",  }} onChange={e => handleMessageTyping(e)}/>
+            <TextField sx={{ width: "100%" }} value={content} onChange={e => handleMessageTyping(e)}/>
             <Button type='submit' variant="contained" sx={{ bgcolor: theme.palette.primary.light, marginLeft: "0.3vw" }}>
                 <SendSharp fontSize="large"/>
             </Button>

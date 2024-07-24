@@ -22,9 +22,10 @@ export function Topbar (props: ITopbarProps) {
     const colors = tokens(theme.palette.mode)
     const colorMode = useContext(ColorModecontext)
 
-    const stateUser = useSelector(state => state.user)
+    const stateUser = useSelector(state => state.userData.user)
     const [localUser, setLocalUser] = useState(stateUser)
     useEffect(() => {
+      console.log(stateUser);
       setLocalUser(stateUser)
     }, [stateUser])
 
@@ -78,7 +79,7 @@ export function Topbar (props: ITopbarProps) {
               <AccountCircle/>
             </IconButton>
             <Typography variant="h3">
-              { localUser !== undefined ? localUser.name : ""}
+              { localUser !== undefined ? localUser.username : ""}
             </Typography>
             <IconButton
               onClick={() => colorMode.toggleColorMode()}>

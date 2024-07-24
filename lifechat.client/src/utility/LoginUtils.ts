@@ -9,10 +9,10 @@ export default class Login {
         console.log(response.token !== undefined);
 
         store.dispatch({ type: 'user/setLoggedIn', payload: true})
-        if(response.username !== undefined){
-            console.log(`setting username to: ${response.username}`);
-            store.dispatch({ type: 'user/setUsername', payload: response.username})
-            console.log(`username set to: ${store.getState().user.name}`)
+        if(response.user !== undefined){
+            console.log(`setting user to: ${response.user}`);
+            store.dispatch({ type: 'user/setUser', payload: response.user})
+            console.log(`user set to: ${store.getState().userData.user}`)
         }
         if(response.token !== undefined){
             console.log(`setting token to: ${response.token}`);
@@ -30,7 +30,7 @@ export default class Login {
 
     static logoutDetails = () => {
         store.dispatch({ type: 'user/setLoggedIn', payload: false})
-        store.dispatch({ type: 'user/setUsername', payload: undefined})
+        store.dispatch({ type: 'user/setUsern', payload: undefined})
         store.dispatch({ type: 'user/setToken', payload: undefined})
         localStorage.removeItem("token")
 
