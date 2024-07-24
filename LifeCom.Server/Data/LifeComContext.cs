@@ -14,11 +14,11 @@ namespace LifeCom.Server.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<User>()
-                .HasMany(u => u.channels)
-                .WithMany(e => e.members)
-                .UsingEntity<UserChannel>(
-                );
+                .HasMany(u => u.chats)
+                .WithMany(c => c.members)
+                .UsingEntity<UserChat>(j => j.Property(uc => uc.role).HasDefaultValueSql("USER"));
         }
 
         public DbSet<User> Users { get; set; }
@@ -33,6 +33,7 @@ namespace LifeCom.Server.Data
 
         public DbSet<Message> Message { get; set; } = default!;
         public DbSet<Chat> Chat { get; set; } = default!;
-        public DbSet<LifeCom.Server.Chats.Channels.Channel> Channel { get; set; } = default!;
+        public DbSet<UserChat> UserChats { get; set; } = default;
+        public DbSet<Channel> Channel { get; set; } = default!;
     }
 }

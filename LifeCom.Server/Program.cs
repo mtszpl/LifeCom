@@ -7,6 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Swashbuckle.AspNetCore.Filters;
+using Microsoft.AspNetCore.Authorization;
+using LifeCom.Server.Auth.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +79,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
+
+//Authorization
+builder.Services.AddScoped<IAuthorizationHandler, ChatRoleHandler>();
+
+builder.Services.AddAuthorization(options => {
+    options.AddPolicy("ChatAdmin", policy =>
+        policy.Requirements.Add(new HasChatRole()));
+});
 
 builder.Services.AddControllers();
 
