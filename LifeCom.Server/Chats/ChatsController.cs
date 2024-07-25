@@ -9,6 +9,7 @@ using LifeCom.Server.Data;
 using System.Security.Claims;
 using LifeCom.Server.Users;
 using Microsoft.AspNetCore.Authorization;
+using static LifeCom.Server.Chats.UserChat;
 
 namespace LifeCom.Server.Chats
 {
@@ -38,6 +39,41 @@ namespace LifeCom.Server.Chats
                 .ToList();
   
             return Ok(userChats);
+        }
+
+        [HttpPost("create")]
+        public ActionResult<bool> CreateChannel([FromBody] string name)
+        {
+            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
+            if (identity == null)
+                return Forbid("Unidentified user");
+            string? idString = identity.FindFirst("id")?.Value;
+            if (idString == null)
+                return NotFound("Unknown user");
+            int id = int.Parse(idString);
+            User? user = _context.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null)
+                return NotFound("Unknown user");
+            Chat newChat = new Chat {
+                name = name
+                };
+
+            if (ModelState.IsValid) 
+            {
+                _context.Add(newChat);
+
+                _context.Add(new UserChat
+                {
+                    user = user,
+                    chat = newChat,
+                    role = ERole.Admin.ToString(),
+                });
+
+                _context.SaveChanges();
+            }
+
+
+            return Ok(true);
         }
     }
 }

@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
-import { ChevronLeft } from '@mui/icons-material';
-import { Box, Drawer, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
+import { Add, ChevronLeft } from '@mui/icons-material';
+import { Box, Divider, Drawer, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -9,6 +9,8 @@ import Channel from '../../model/Channel';
 import Chat from '../../model/Chat';
 import { useNavigate } from 'react-router-dom';
 import { tokens } from '../../Theme';
+import { SignalConnector } from '../../API/SignalConnector';
+import { CreateChatDialog } from './CreateChatDialog';
 
 
 interface IDrawerProps {
@@ -22,48 +24,49 @@ interface IDrawerProps {
 export function ContactsDrawer (props: IDrawerProps) {
 
   const theme = useTheme()
-  const colors = tokens(theme.palette.mode)
 
   const apiUrl: string = "https://localhost:7078/api/"
   const [channels, setChannels] = useState<Channel[]>([])
   const [chats, setChats] = useState<Chat[]>([])
-  const [selectedChat, selectChat] = useState<Chat | undefined>(undefined)
+  const [selectedChat, selectChat] = useState<Chat | string>('')
+  const [chatCreatorOpen, setChatCreatorOpen] = useState<boolean>(false)
 
   const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
+  const connector: SignalConnector = useSelector(state => state.connectorContainer.connector)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if(connector !== undefined)
+      connector.onCreateChat(getChats)
+  }, [])
 
   useEffect(() => {
     if(!isLoggedIn)
       return
-    const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
-      .subscribe(({
-        next(response) {
-          setChats([...response])
-        },
-        error(err: Error) { console.error(err.message) },
-        complete(){
-          chatSubscription.unsubscribe()
-        }
-      }))
+    getChats()
+
   }, [isLoggedIn])  
 
   const [drawerOpen, setDrawerOpen] = useState<boolean>(props.open)
   useEffect(() => setDrawerOpen(props.open), [props.open])
 
+  //Getting channels on chat change
   useEffect(() => {
-    console.log(selectedChat);
-    if(selectedChat === undefined){
-      setChannels([])
-      navigate("")
-    }
-    else
+    setChannels([])
+    navigate("")    
+    if(selectedChat !== undefined && typeof selectedChat !== 'string')
       getChannels(selectedChat.id)
   }, [selectedChat])
 
+  /**
+   * Loads channels of chat from server
+   * @param chatId Id of selected chat
+   */
   const getChannels = (chatId: number) => {
-    const channelsSubscription = HttpClient.get(`${apiUrl}Channels?channelId=${chatId}`)
+    const channelsSubscription = HttpClient.get(`${apiUrl}Channels/bychat?chatId=${chatId}`)
     .subscribe({
       next(response) {
+        console.log(response);
         if(response !== undefined)
           setChannels(response)
       },
@@ -72,6 +75,22 @@ export function ContactsDrawer (props: IDrawerProps) {
         channelsSubscription.unsubscribe()
       }
     })
+  }
+
+  /**
+   * Loads chats of logged user
+   */
+  const getChats = () => {
+    const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
+      .subscribe(({
+        next(response) {
+          setChats([...response]);
+        },
+        error(err: Error) { console.error(err.message); },
+        complete() {
+          chatSubscription.unsubscribe();
+        }
+      }));
   }
 
   const toggleOpen = () => {
@@ -85,10 +104,15 @@ export function ContactsDrawer (props: IDrawerProps) {
   }
   
   const handleChatSelect = (e: SelectChangeEvent) => {
-    if(typeof e.target.value === 'string')
-      selectChat(undefined)
-    else 
+    if(typeof e.target.value === 'string'){
+      if(e.target.value === "Add"){
+        openChatCreator()
+      }
       selectChat(e.target.value)
+      return
+    }
+    selectChat(e.target.value)
+    setChatCreatorOpen(false)
   }
   
   const header = () => {
@@ -119,18 +143,45 @@ export function ContactsDrawer (props: IDrawerProps) {
               marginBottom: "1vh",
               color: theme.palette.secondary.main
             }}>
-              <MenuItem value="None">None</MenuItem>
+              <MenuItem value="None">
+                <Typography>
+                  None
+                </Typography>
+              </MenuItem>
+              <Divider/>
               {
                 chats.map((chat, idx) => (
-                  <MenuItem value={chat} key={idx}>{chat.name}</MenuItem>
+                    <MenuItem value={chat} key={idx}>
+                      <Typography>
+                        {chat.name}
+                      </Typography>
+                    </MenuItem>
                 ))
               }
+              <Divider/>
+              <MenuItem value="Add" sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between"
+              }}>
+                <Typography>Add</Typography>
+                <Add/>
+              </MenuItem>
           </Select>
         </Box>
       </FormControl>
     )
   }
 
+  function openChatCreator() {
+    setChatCreatorOpen(true)
+  }
+
+  const createChat = (name: string) => {
+    setChatCreatorOpen(false)
+    getChats()
+    selectChat(name)
+  }
 
   return (
     <Drawer
@@ -150,6 +201,7 @@ export function ContactsDrawer (props: IDrawerProps) {
       >
         {header()}
         {chatSelect()}
+        <CreateChatDialog open={chatCreatorOpen} return={createChat}/>
         <Box display="flex" flexDirection="column" alignItems="flex-start" paddingY="1vh" paddingLeft="0.5vw" height="100%" bgcolor={theme.palette.background.default}>
           { 
             channels.map((channel, idx) => (
@@ -177,3 +229,4 @@ export function ContactsDrawer (props: IDrawerProps) {
     </Drawer>
   );
 }
+

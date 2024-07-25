@@ -45,14 +45,17 @@ namespace LifeCom.Server.Chats.Channels
         }
 
         [HttpGet("bychat")]
-        public ActionResult<List<Channel>> GetByChannel(int chatId)
+        public ActionResult<List<Channel>> GetByChat(int chatId)
         {
-            ClaimsIdentity? identity = HttpContext.User.Identities as ClaimsIdentity;
+            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
             if (identity == null)
                 return Forbid("Unauthorized");
+            string? idString = identity.FindFirst("id")?.Value;
+            if (idString == null)
+                return NotFound("User not found");
+            int userId = int.Parse(idString);
 
-            List<Channel> channels = _channelService.GetByChat(chatId);
-            return channels;
+            return _channelService.GetByChatOfUser(chatId, userId); ;
         }
 
         [HttpPost("user")]

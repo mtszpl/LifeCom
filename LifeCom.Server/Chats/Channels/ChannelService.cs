@@ -23,6 +23,11 @@ namespace LifeCom.Server.Chats.Channels
             return _context.Channel.Where(ch => ch.chatId == chatId).ToList();
         }
 
+        public List<Channel> GetByChatOfUser(int chatId, int userId)
+        {
+            return _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
+        }
+
         public Task<Channel?> GetByIdAsync(int? id)
         {
             return _context.Channel.FirstOrDefaultAsync(m => m.Id == id);
