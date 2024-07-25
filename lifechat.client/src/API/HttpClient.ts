@@ -62,11 +62,20 @@ export default class HttpClient {
     /**
      * Executes 'get' request
      * @param url Endpoint url
-     * @param getFirst If true returns only first value, default true
+     * @param params Request parameters, default withCredentials with content-type "application/json"
      * @returns Observable with data from call or error message if occured
      */
-    static get = (url: string, params: any = undefined) => {     
-        const axiosPromise = HttpClient.API.get(url, {withCredentials: true})
+    static get = (url: string, params: any = undefined) => {    
+        if(params === undefined)
+            params = {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        else 
+            params.withCredentials = true 
+        const axiosPromise = HttpClient.API.get(url, params)
         return from(axiosPromise.then(response => {
             return response.data
         }).catch(error => {
@@ -82,11 +91,22 @@ export default class HttpClient {
      * Executes 'post' request
      * @param url Endpoint url
      * @param payload Request payload
-     * @param contentType Content type of request, default application/json
+     * @param params Request parameters, default withCredentials with content-type "application/json"
      * @returns Observable with data from call or error message if occured
      */
-    static post = (url: string, payload: unknown, params: any = undefined, contentType: string = "application/json") => {
-        const axiosPromise = HttpClient.API.post(url, payload, {withCredentials: true})
+    static post = (url: string, payload: unknown, params: any = undefined) => {
+        if(params === undefined)
+            params = {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        else 
+            params.withCredentials = true
+        
+        console.log(params);
+        const axiosPromise = HttpClient.API.post(url, payload, params,)
         return from(axiosPromise.then(response => {
             return response.data;
         }).catch(error => {
