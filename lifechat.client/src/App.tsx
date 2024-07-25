@@ -11,6 +11,7 @@ import { LandingPage } from './pages/LandingPage';
 import { useEffect } from 'react';
 import { MainDefault } from './components/MainDefault';
 import { MessageChannel } from './components/MessageChannel';
+import { NotFound } from './pages/NotFound';
 
 function App() {
     const [theme, colorMode] = useMode()
@@ -39,6 +40,7 @@ function App() {
                                 condition ? <LoginPage/> : <Navigate to={"/"}/>
                             }/>
                             <Route path="/register" element={<RegisterPage/>}/>
+                            <Route path="/*" element={<NotFound/>}/>
                         </Routes>
                     </Provider>
             </ThemeProvider>
