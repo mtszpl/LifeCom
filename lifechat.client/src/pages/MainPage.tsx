@@ -56,6 +56,7 @@ function MainPage() {
     const [contentOffset, setContentOffset] = useState<number>(0)
     const drawerWidth: number = 20
     const drawerTransitionTime: number = 400
+    const barHeight: number = 5
 
 
     useEffect(() => {
@@ -82,13 +83,13 @@ function MainPage() {
                 bgcolor: theme.palette.background.default
             }}>
             <ContactsDrawer 
-                height={5}
+                height={barHeight}
                  open={drawerOpen}
                  width={drawerWidth}
                  transitionTime={drawerTransitionTime}
                  handleClose={updateDrawer}/>
-            <Topbar height={5} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
-            <Box width="100%" height="100%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
+            <Topbar height={barHeight} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
+            <Box width="100%" height="96%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
                 <Outlet/>
             </Box>
 

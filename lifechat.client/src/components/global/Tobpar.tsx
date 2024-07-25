@@ -41,13 +41,12 @@ export function Topbar (props: ITopbarProps) {
 
   return (
     <Box sx={{width:"100%", height: `${height}vh`}}>
-
       <AppBar position="absolute" 
-        sx={{height: '5vh', width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.background.light,
+        sx={{height: `${height}vh`, width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.background.light,
         transition: `width ${props.drawerTransitionTime}ms ease-out`
         
       }}>
-        <Box sx={{height: `${height}vh`}} display="flex" justifyContent="space-between" alignItems="center">
+        <Box sx={{height: `100%`}} display="flex" justifyContent="space-between" alignItems="center">
           <Box display="flex" alignItems="center">
             <IconButton sx={{ color: colors.white[200], marginX: "0.5vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
               <MenuIcon fontSize='large'/>
