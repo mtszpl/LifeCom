@@ -1,15 +1,12 @@
 import { useTheme } from '@emotion/react';
 import { Add, ChevronLeft } from '@mui/icons-material';
 import { Box, Divider, Drawer, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Typography } from '@mui/material';
-import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import HttpClient from '../../API/HttpClient';
 import Channel from '../../model/Channel';
 import Chat from '../../model/Chat';
 import { useNavigate } from 'react-router-dom';
-import { tokens } from '../../Theme';
-import { SignalConnector } from '../../API/SignalConnector';
 import { CreateChatDialog } from './CreateChatDialog';
 
 
@@ -32,13 +29,8 @@ export function ContactsDrawer (props: IDrawerProps) {
   const [chatCreatorOpen, setChatCreatorOpen] = useState<boolean>(false)
 
   const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
-  const connector: SignalConnector = useSelector(state => state.connectorContainer.connector)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if(connector !== undefined)
-      connector.onCreateChat(getChats)
-  }, [])
 
   useEffect(() => {
     if(!isLoggedIn)
@@ -117,13 +109,13 @@ export function ContactsDrawer (props: IDrawerProps) {
   
   const header = () => {
     return (
-      <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} justifyContent="flex-end" bgcolor={theme.palette.background.dark}>
-      <Typography variant="h3">
-        Contacts
-      </Typography>
-      <IconButton onClick={() => toggleOpen()}>
-        <ChevronLeft/>
-      </IconButton>
+      <Box display="flex" alignItems="center" height={`${ props.height ?? 5 }vh`} padding="1vh" justifyContent="flex-end" bgcolor={theme.palette.background.dark}>
+        <Typography variant="h3">
+          Contacts
+        </Typography>
+        <IconButton onClick={() => toggleOpen()}>
+          <ChevronLeft/>
+        </IconButton>
     </Box>
     )
   }
@@ -191,7 +183,8 @@ export function ContactsDrawer (props: IDrawerProps) {
         bgcolor: theme.palette.background.default,
         '& .MuiDrawer-paper': {
           width: `${props.width}vw`,
-          boxSizing: "border-box"
+          boxSizing: "border-box",
+          transition: `width ${props.transitionTime ?? 800}ms ease-out`
         }
       }}
       variant="persistent"

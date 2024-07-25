@@ -31,8 +31,6 @@ export function Topbar (props: ITopbarProps) {
 
     const navigate = useNavigate()
 
-    const height = props.height ?? 5;
-
     const logout = () => {
       LoginUtils.logoutDetails()
       Interceptors.removeAuthInterceptor()
@@ -40,59 +38,56 @@ export function Topbar (props: ITopbarProps) {
     }
 
   return (
-    <Box sx={{width:"100%", height: `${height}vh`}}>
-      <AppBar position="absolute" 
-        sx={{height: `${height}vh`, width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.background.light,
-        transition: `width ${props.drawerTransitionTime}ms ease-out`
-        
-      }}>
-        <Box sx={{height: `100%`}} display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center">
-            <IconButton sx={{ color: colors.white[200], marginX: "0.5vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
-              <MenuIcon fontSize='large'/>
-            </IconButton>
-            <Box display="flex" alignItems="center" onClick={() => navigate("/")}
-                sx={{
-                  cursor: "pointer"
-                }}
-              >
-              <img src={logo}  width="5%" color={colors.white[100]}/>
-              <Typography variant='h3' color={colors.white[200]} ml="2vh">
-                LifeCom
-              </Typography>
-            </Box>
-          </Box>
-          <span/>
-          <Box display="flex" alignItems="center">
-            <Button 
-              variant="contained"
-              onClick={() => logout()}
-              >
-              Log out
-            </Button>
-            <IconButton onClick={() => {
-              stateUser.loggedIn ?
-                navigate('/username') :
-                navigate(`/login`)
-            }}>
-              <AccountCircle/>
-            </IconButton>
-            <Typography variant="h3">
-              { localUser !== undefined ? localUser.username : ""}
+    <AppBar position="absolute" 
+      sx={{height: `100%`, width: `calc(100vw - ${props.drawerWidth}vw)`, bgcolor: theme.palette.background.light,
+      transition: `width ${props.drawerTransitionTime}ms ease-out`        
+    }}>
+      <Box sx={{height: `100%`}} display="flex" justifyContent="space-between" alignItems="center">
+        <Box display="flex" alignItems="center">
+          <IconButton sx={{ color: colors.white[200], marginX: "0.5vw"}}  onClick={() => {if (props.onMenuOpen !== undefined) props.onMenuOpen()}}>
+            <MenuIcon fontSize='large'/>
+          </IconButton>
+          <Box display="flex" alignItems="center" onClick={() => navigate("/")}
+              sx={{
+                cursor: "pointer"
+              }}
+            >
+            <img src={logo}  width="5%" color={colors.white[100]}/>
+            <Typography variant='h3' color={colors.white[200]} ml="2vh">
+              LifeCom
             </Typography>
-            <IconButton
-              onClick={() => colorMode.toggleColorMode()}>
-              {
-                theme.palette.mode === "dark" ? (
-                  <BrightnessLowOutlined/>
-                ) : (
-                  <BrightnessHigh/>
-                )
-              }
-            </IconButton>
           </Box>
         </Box>
-      </AppBar>
-    </Box>
+        <span/>
+        <Box display="flex" alignItems="center">
+          <Button 
+            variant="contained"
+            onClick={() => logout()}
+            >
+            Log out
+          </Button>
+          <IconButton onClick={() => {
+            stateUser.loggedIn ?
+              navigate('/username') :
+              navigate(`/login`)
+          }}>
+            <AccountCircle/>
+          </IconButton>
+          <Typography variant="h3">
+            { localUser !== undefined ? localUser.username : ""}
+          </Typography>
+          <IconButton
+            onClick={() => colorMode.toggleColorMode()}>
+            {
+              theme.palette.mode === "dark" ? (
+                <BrightnessLowOutlined/>
+              ) : (
+                <BrightnessHigh/>
+              )
+            }
+          </IconButton>
+        </Box>
+      </Box>
+    </AppBar>
   );
 }

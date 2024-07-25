@@ -84,14 +84,17 @@ function MainPage() {
             }}>
             <ContactsDrawer 
                 height={barHeight}
-                 open={drawerOpen}
-                 width={drawerWidth}
-                 transitionTime={drawerTransitionTime}
-                 handleClose={updateDrawer}/>
-            <Topbar height={barHeight} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
-            <Box width="100%" height="96%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
-                <Outlet/>
+                open={drawerOpen}
+                width={drawerWidth}
+                transitionTime={drawerTransitionTime}
+                handleClose={updateDrawer}/>
+            <Box sx={{width:"100%", height: `${barHeight}vh`, position: 'relative'}}>
+                <Topbar height={barHeight} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
             </Box>
+
+            {/* <Box width="100%" height="96%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
+                <Outlet/>
+            </Box> */}
 
         </Box>
     )
