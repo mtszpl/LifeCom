@@ -22,6 +22,11 @@ namespace LifeCom.Server.Users
             return _context.Users.FirstOrDefaultAsync(m => m.Id == id);
         }
 
+        public List<User> GetByNamePart(string name)
+        {
+            return _context.Users.Where(u => u.username.Contains(name)).ToList();
+        }
+
         public ValueTask<User?> FindAsync(int id)
         {
             return _context.Users.FindAsync(id);
@@ -37,6 +42,16 @@ namespace LifeCom.Server.Users
         {
             _context.Users.Remove(user);
             return _context.SaveChangesAsync();
+        }
+
+        public bool ChangeUsername(int? id, string newName)
+        {
+            User? user = GetById(id);
+            if (user == null)
+                return false;
+            user.username = newName;
+            _context.SaveChanges();
+            return true;
         }
 
         public bool UserExists(int id)

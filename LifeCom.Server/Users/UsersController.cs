@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Data;
 using Microsoft.AspNet.SignalR;
 using System.Security.Claims;
+using LifeCom.Server.Models;
 
 namespace LifeCom.Server.Users
 {
@@ -16,6 +17,7 @@ namespace LifeCom.Server.Users
     public class UsersController : Controller
     {
         private readonly UserService _userService;
+
 
         public UsersController(LifeComContext context)
         {
@@ -44,6 +46,38 @@ namespace LifeCom.Server.Users
             return Ok(response);
         }
 
+        [HttpGet("byName")]
+        public ActionResult<List<UserResponse>> GetByName([FromBody] string namePart)
+        {
+            if(namePart == null)
+                return NotFound();
+            List<UserResponse> users = _userService.GetByNamePart(namePart).Select(u => new UserResponse(u)).OrderBy(ur => ur.username).Take(20).ToList();
+            return users;
+        }
+
+        [HttpPut("image")]
+        public async Task<ActionResult> UploadImage([FromBody] IFormFile imageFile)
+        {
+            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            User? toChange = _userService.GetById(id);
+            if (toChange == null)
+                return NotFound("User not found");
+            using MemoryStream stream = new MemoryStream();
+            await imageFile.CopyToAsync(stream);
+            byte[] imageBytes = stream.ToArray();
+            toChange.profilePic = imageBytes;
+            return Ok();
+        }
+
+        [HttpPut("username")]
+        public ActionResult ChangeUsername([FromBody] string newName)
+        {
+            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if (_userService.ChangeUsername(id, newName))
+                return Ok("Username changed!");
+            else
+                return BadRequest("Error occured");
+        }
 
         // POST: Users/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
