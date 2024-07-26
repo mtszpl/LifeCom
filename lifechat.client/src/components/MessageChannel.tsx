@@ -1,7 +1,6 @@
 import { Box, TextField, Button, useTheme } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Message from '../model/Message';
-import User from '../model/User';
 import HttpClient from '../API/HttpClient';
 import { MessageBox } from './MessageBox';
 import { useSelector } from 'react-redux';
@@ -9,10 +8,7 @@ import { SignalConnector } from '../API/SignalConnector';
 import { useParams } from 'react-router-dom';
 import { SendSharp } from '@mui/icons-material';
 
-export interface IMessageChannelProps {
-}
-
-export function MessageChannel (props: IMessageChannelProps) {
+export function MessageChannel () {
     const { id } = useParams()
 
     const theme: Theme = useTheme()

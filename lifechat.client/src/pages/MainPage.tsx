@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { setConnector } from "../store/slices/ConnectorSlice";
 import { SignalConnector }  from "../API/SignalConnector";
 import { Topbar } from "../components/global/Tobpar";
-import { ContactsDrawer } from "../components/global/ContactsDrawer";
+import { ContactsDrawer } from "../components/global/contacts-drawer/ContactsDrawer";
 import Interceptors from "../API/Interceptors";
 import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
 import HttpClient from "../API/HttpClient";
@@ -92,9 +92,9 @@ function MainPage() {
                 <Topbar height={barHeight} onMenuOpen={toggleDrawer} drawerWidth={ drawerOpen === true ? drawerWidth : 0} drawerTransitionTime={drawerTransitionTime}/> 
             </Box>
 
-            {/* <Box width="100%" height="96%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
+            <Box width="100%" height="96%" display="flex" alignItems="center" justifyContent="center" bgcolor={theme.palette.background.light}>
                 <Outlet/>
-            </Box> */}
+            </Box>
 
         </Box>
     )
