@@ -1,64 +1,70 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import * as React from 'react';
-import HttpClient from '../../API/HttpClient';
+import HttpClient from '../../../API/HttpClient';
+import Chat from '../../../model/Chat';
 
-export interface ICreateChatDialogProps {
+export interface ICreateChannelDialogProps {
     open: boolean
-    return: (name: string) => void
+    chat: {chat: Chat | undefined, role: string}
+    handleReturn: (name: string) => void
+    handleCancel: () => void
 }
 
-export function CreateChatDialog (props: ICreateChatDialogProps) {
-    const [open, setOpen] = React.useState<boolean>(props.open)
-    const chatsUrl: string = "https://localhost:7078/api/Chats/create"
+export function CreateChannelDialog (props: ICreateChannelDialogProps) {
+    const chatsUrl: string = "https://localhost:7078/api/Channels/create"
 
-    React.useEffect(() => {
-        setOpen(props.open)
-    }, [props.open])
 
     function handleClose(): void {
-        setOpen(false)
+        props.handleCancel()
     }
 
     function submit (event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()
+        if(props.chat === undefined || typeof props.chat === "string"){
+            close()
+            return
+        }
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries((formData as any).entries());
         const name = formJson.chatName
         handleClose()
-
-        const subscription = HttpClient.post(chatsUrl, name)
+        const payload = {
+            chatId: props.chat.id,
+            name: name
+        }
+        const subscription = HttpClient.post(chatsUrl, payload)
             .subscribe({
                 next() {},
                 error(err: Error) {console.error(err.message)},
                 complete() { 
                     subscription.unsubscribe()
                     
-                    if(props.return !== undefined) 
-                        props.return(name)
+                    if(props.handleReturn !== undefined) 
+                        props.handleReturn(name)
                  }
             })
     }
 
   return (
     <Dialog
-        open={open}
+        open={props.open}
         onClose={handleClose}
         PaperProps={{
             component: 'form',
             onSubmit: submit
         }}
     >
-        <DialogTitle>Create new chat</DialogTitle>
+        <DialogTitle>Create new channel in chat {props.chat === undefined ? null : typeof props.chat !== "string" ? props.chat.name : props.chat}</DialogTitle>
         <DialogContent>
             <DialogContentText>
-                Name of your new chat:
+                Name of your new channel:
             </DialogContentText>
             <TextField
                 autoFocus
                 required
                 margin='dense'
                 name='chatName'
-                label='Name of chat'
+                label='Name of channel'
                 fullWidth
                 variant='filled'
                 />
