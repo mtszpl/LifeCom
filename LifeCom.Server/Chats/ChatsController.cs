@@ -32,9 +32,6 @@ namespace LifeCom.Server.Chats
             if (id == null)
                 return NotFound("User not found");
             var query = _context.UserChats.Where(uc => uc.userId == id).Join(_context.Chat, uc => uc.chatId, u => u.Id, (uc, c) => new { chat = c, role = uc.role}).ToList();
-            List<Chat> userChats = _context.Users.Where(user => user.Id == id)
-                .SelectMany(u => u.chats)
-                .ToList();
   
             return Ok(query);
         }

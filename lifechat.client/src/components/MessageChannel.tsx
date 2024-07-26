@@ -55,7 +55,7 @@ export function MessageChannel () {
 
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%">   
-        <Box display="flex" flexDirection="column" height="100%" gap="1vh" marginY="2vh" overflow="auto" bgcolor={theme.palette.background.light}>
+        <Box display="flex" flexDirection="column" height="100%" gap="2vh" marginY="2vh" overflow="auto" bgcolor={theme.palette.background.light}>
             {
                 messages.map((msg, idx) => (
                     <MessageBox message={msg} key={idx}/>
