@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { MainDefault } from './components/MainDefault';
 import { MessageChannel } from './components/MessageChannel';
 import { NotFound } from './pages/NotFound';
+import { UserPage } from './pages/UserPage';
 
 function App() {
     const [theme, colorMode] = useMode()
@@ -35,6 +36,7 @@ function App() {
                                 <Route index element={<MainDefault/>}/>
                                 <Route path=":username"/>
                                 <Route path="channel/:id" element={<MessageChannel/>}/>
+                                <Route path="user" element={<UserPage/>}/>
                             </Route>
                             <Route path="/login" element={
                                 condition ? <LoginPage/> : <Navigate to={"/"}/>

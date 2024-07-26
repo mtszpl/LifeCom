@@ -9,6 +9,7 @@ import logo from '../../assets/logo_white.png'
 import { useSelector } from 'react-redux';
 import Interceptors from '../../API/Interceptors';
 import LoginUtils from '../../utility/LoginUtils';
+import defaultAvatar from '../../assets/defaultAvatar.png';
 
 export interface ITopbarProps {
   drawerWidth: number
@@ -22,12 +23,10 @@ export function Topbar (props: ITopbarProps) {
     const colors = tokens(theme.palette.mode)
     const colorMode = useContext(ColorModecontext)
 
-    const stateUser = useSelector(state => state.userData.user)
-    const [localUser, setLocalUser] = useState(stateUser)
+    const userData = useSelector(state => state.userData)
     useEffect(() => {
-      console.log(stateUser);
-      setLocalUser(stateUser)
-    }, [stateUser])
+      console.log(userData);
+    }, [userData])
 
     const navigate = useNavigate()
 
@@ -66,15 +65,25 @@ export function Topbar (props: ITopbarProps) {
             >
             Log out
           </Button>
-          <IconButton onClick={() => {
-            stateUser.loggedIn ?
-              navigate('/username') :
-              navigate(`/login`)
-          }}>
-            <AccountCircle/>
-          </IconButton>
+          <Box
+            component="img"
+            width="1.7vw"
+            marginX="1vw"
+            sx={{
+              aspectRatio: 1,
+              ':hover': {
+                cursor: 'pointer'
+              }
+            }}
+            src={defaultAvatar}
+            onClick={() => {
+              userData.loggedIn ?
+                navigate(`user`) :
+                navigate(`/login`)
+            }}
+            />
           <Typography variant="h3">
-            { localUser !== undefined ? localUser.username : ""}
+            { userData.loggedIn ? userData.user.username : ""}
           </Typography>
           <IconButton
             onClick={() => colorMode.toggleColorMode()}>
