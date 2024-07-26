@@ -9,6 +9,7 @@ using LifeCom.Server.Data;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Users;
+using LifeCom.Server.Models;
 
 namespace LifeCom.Server.Chats.Channels
 {
@@ -17,10 +18,12 @@ namespace LifeCom.Server.Chats.Channels
     public class ChannelsController : Controller
     {
         private readonly ChannelService _channelService;
+        private readonly ChatService _chatService;
 
         public ChannelsController(LifeComContext context)
         {
             _channelService = new ChannelService(context);
+            _chatService = new ChatService(context);
         }
 
         // GET: Channels
@@ -33,13 +36,9 @@ namespace LifeCom.Server.Chats.Channels
         [HttpGet]
         public ActionResult<List<Channel>> GetByUser() 
         {
-            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                return Forbid("Unauthorized");
-            string? idString = identity.FindFirst("id")?.Value;
-            if(idString == null)
-                return Forbid("Unathorized");
-            int userId = int.Parse(idString);
+            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if(userId == null)
+                return NotFound("User not found");
 
             return _channelService.GetOfUserById(userId);
         }
@@ -47,25 +46,37 @@ namespace LifeCom.Server.Chats.Channels
         [HttpGet("bychat")]
         public ActionResult<List<Channel>> GetByChat(int chatId)
         {
-            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                return Forbid("Unauthorized");
-            string? idString = identity.FindFirst("id")?.Value;
-            if (idString == null)
+            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if (userId == null)
                 return NotFound("User not found");
-            int userId = int.Parse(idString);
 
-            return _channelService.GetByChatOfUser(chatId, userId); ;
+            return _channelService.GetByChatOfUser(chatId, (int)userId); ;
+        }
+
+        [HttpPost("create")]
+        [Authorize(Policy = "ChatAdmin")]
+        public ActionResult CreateChannel([FromBody]int chatId, [FromBody]string name)
+        {
+            Console.WriteLine("Creting channel");
+            Chat? owningChat = _chatService.GetById(chatId);
+            if(owningChat == null)
+                return NotFound("Chat not found");
+
+            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if (userId == null)
+                return NotFound("User not found");
+
+            Channel channel = new Channel 
+            {
+                name = name,
+                chat = owningChat,
+                members = new List<User> { }
+            };
+
+            return Ok(channel);
         }
 
         [HttpPost("user")]
-        [Authorize(Policy = "ChatAdmin")]
-        public void CreateChannel([FromBody]Chat chat, string name)
-        {
-
-        }
-
-        [HttpPost("add")]
         [Authorize(Policy = "ChatAdmin")]
         public void AddUser([FromBody]UserRequest user)
         {

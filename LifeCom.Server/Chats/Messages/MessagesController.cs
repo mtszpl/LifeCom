@@ -12,6 +12,7 @@ using LifeCom.Server.Users;
 using LifeCom.Server.Hubs;
 using LifeCom.Server.Chats.Channels;
 using Microsoft.AspNetCore.SignalR;
+using LifeCom.Server.Models;
 
 namespace LifeCom.Server.Chats.Messages
 {
@@ -76,14 +77,8 @@ namespace LifeCom.Server.Chats.Messages
             if (messageRequest.content == string.Empty || messageRequest.channelId == null)            
                 return BadRequest("Content missing");
             
-            Console.WriteLine(messageRequest);
-
-            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                throw new InvalidOperationException("Unidentified user");
-
-            int? id = int.Parse(identity.FindFirst("id").Value);
-            if(!id.HasValue)
+            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if (id == null)
                 return NotFound("User not found");
 
             User? author = _userService.GetById(id);
