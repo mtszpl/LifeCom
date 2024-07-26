@@ -60,9 +60,12 @@ namespace LifeCom.Server.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendMessage(User author, string message){
-
+        public async Task SendMessage(User author, string message)
+        {
             await Clients.All.ReceiveMessage(new UserResponse(author), message);
         }
+
+        public async Task CreateChannel()
+        { }
     }
 }

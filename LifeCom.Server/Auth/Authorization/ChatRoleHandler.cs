@@ -2,7 +2,9 @@
 using LifeCom.Server.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using NuGet.Protocol;
 using System.Security.Claims;
+using Newtonsoft.Json;
 using static LifeCom.Server.Chats.UserChat;
 
 namespace LifeCom.Server.Auth.Authorization
@@ -12,11 +14,19 @@ namespace LifeCom.Server.Auth.Authorization
 
     public class ChatRoleHandler : AuthorizationHandler<HasChatRole> 
     {
-        private readonly LifeComContext _context;
+        private class ChatAuthData
+        {
+            public int chatId = -1;
+            public string name = string.Empty;
+        }
 
-        public ChatRoleHandler(LifeComContext context)
+        private readonly LifeComContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ChatRoleHandler(LifeComContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, HasChatRole requirement)
@@ -28,8 +38,19 @@ namespace LifeCom.Server.Auth.Authorization
             if(idString == null) 
                 return Task.CompletedTask;
             int id = int.Parse(idString);
-            UserChat? userChat = _context.UserChats.FirstOrDefault(u => u.userId == id);
-            if(userChat == null) return Task.CompletedTask;
+            if (_httpContextAccessor.HttpContext == null)
+                return Task.CompletedTask;
+
+            using StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body);
+            string queryParams = reader.ReadToEndAsync().Result;
+  
+            ChatAuthData? requestBody = JsonConvert.DeserializeObject<ChatAuthData>(queryParams);
+            if (requestBody == null)
+                return Task.CompletedTask;
+
+
+            UserChat? userChat = _context.UserChats.FirstOrDefault(u => u.userId == id && u.chatId == requestBody.chatId);
+            if (userChat == null) return Task.CompletedTask;
 
             if (userChat.role == ERole.Admin.ToString())
                 context.Succeed(requirement);

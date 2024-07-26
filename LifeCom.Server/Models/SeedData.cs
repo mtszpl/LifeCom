@@ -18,12 +18,12 @@ namespace LifeCom.Server.Models
                 Chat theOtherChat = new Chat {  name = "other" };
                 Channel driversChannel = new Channel 
                 {
-                    Name = "drivers",
+                    name = "drivers",
                     chat = ferrariChat
                 };
                 Channel formerDriversChannel = new Channel 
                 {
-                    Name = "former-drivers",
+                    name = "former-drivers",
                     chat = ferrariChat
                 };
                 User charles = new User

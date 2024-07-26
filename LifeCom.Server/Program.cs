@@ -82,6 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //Authorization
 builder.Services.AddScoped<IAuthorizationHandler, ChatRoleHandler>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("ChatAdmin", policy =>
