@@ -1,10 +1,10 @@
-import { useTheme } from '@emotion/react';
 import { ExpandMore } from '@mui/icons-material';
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, TextField, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Typography } from '@mui/material';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import defaultAvatar from '../assets/defaultAvatar.png';
 import { ChangeUsernameDialog } from '../components/ChangeUsernameDialog';
+import { ChangeEmailDialog } from '../components/global/ContactsDrawer/ChatComponents/ChangeEmailDialog';
 
 export interface IUserPageProps {
 }
@@ -16,6 +16,10 @@ export function UserPage (props: IUserPageProps) {
     const [changingEmail, setChangingEmail] = React.useState<boolean>(false)
     
     const changeUsername = (newUsername: string) => {
+
+    }
+
+    const changeEmail = (newEmail: string) => {
 
     }
 
@@ -69,6 +73,7 @@ export function UserPage (props: IUserPageProps) {
             </AccordionDetails>
         </Accordion>
         <ChangeUsernameDialog open={changingUsername} onSubmit={changeUsername} onCancel={() => setChangingUsername(false)}/>
+        <ChangeEmailDialog open={changingEmail} onSubmit={changeEmail} onCancel={() => setChangingEmail(false)}/>
     </Box>
   );
 }
