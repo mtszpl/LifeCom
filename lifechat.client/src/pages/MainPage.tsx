@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { setConnector } from "../store/slices/ConnectorSlice";
 import { SignalConnector }  from "../API/SignalConnector";
 import { Topbar } from "../components/global/Tobpar";
-import { ContactsDrawer } from "../components/global/contacts-drawer/ContactsDrawer";
+import { ContactsDrawer } from "../components/global/ContactsDrawer/ContactsDrawer";
 import Interceptors from "../API/Interceptors";
 import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
 import HttpClient from "../API/HttpClient";
@@ -36,6 +36,7 @@ function MainPage() {
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
                     next(response) {
+                        console.log(response);
                         dispatch(setUser(response))
                         dispatch(setToken(token))
                         dispatch(setLoggedIn(true))
