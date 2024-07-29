@@ -15,7 +15,7 @@ export function CreateChatDialog (props: ICreateChatDialogProps) {
         event.preventDefault()
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries((formData as any).entries());
-        const name = formJson.chatName
+        const name: string = formJson.chatName
 
         const subscription = HttpClient.post(chatsUrl, name)
             .subscribe({

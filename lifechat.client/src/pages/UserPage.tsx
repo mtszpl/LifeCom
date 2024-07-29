@@ -4,7 +4,8 @@ import * as React from 'react';
 import { useSelector } from 'react-redux';
 import defaultAvatar from '../assets/defaultAvatar.png';
 import { ChangeUsernameDialog } from '../components/ChangeUsernameDialog';
-import { ChangeEmailDialog } from '../components/global/ContactsDrawer/ChatComponents/ChangeEmailDialog';
+import { ChangeEmailDialog } from '../components/ChangeEmailDialog';
+import HttpClient from '../API/HttpClient';
 
 export interface IUserPageProps {
 }
@@ -12,14 +13,25 @@ export interface IUserPageProps {
 export function UserPage (props: IUserPageProps) {
     const userData = useSelector(store => store.userData)
 
+    React.useEffect(() => {
+        console.log(userData);
+        console.log(userData.user);
+    }, [userData])
+
     const [changingUsername, setChangingUsername] = React.useState<boolean>(false)
     const [changingEmail, setChangingEmail] = React.useState<boolean>(false)
+
+    const url: string = "https://localhost:7078/api/Users"
     
     const changeUsername = (newUsername: string) => {
-
+        setChangingUsername(false)
+        console.log(`changing username: ${newUsername}`);
+        HttpClient.put(`${url}/username`, newUsername)
     }
-
+    
     const changeEmail = (newEmail: string) => {
+        setChangingEmail(false)
+        console.log(`changing email to: ${newEmail}`);
 
     }
 
@@ -29,7 +41,7 @@ export function UserPage (props: IUserPageProps) {
             User settings
         </Typography>
         <Typography variant='h1'>
-            {userData.user.username}
+            {/* {userData !== undefined ? userData.user.username : null} */}
         </Typography>
         <Box
             sx={{
@@ -37,11 +49,12 @@ export function UserPage (props: IUserPageProps) {
                 aspectRatio: 1
             }}
           component="img"
-          src={
-            userData.user.profilePic !== "" ?
-                userData.user.profilePic :
-                defaultAvatar
-          }
+        //   src={
+        //     (userData !== undefined &&
+        //     userData.user.profilePic !== "") ?
+        //         userData.user.profilePic :
+        //         defaultAvatar
+        //   }
         />
         <Button variant="contained">
             Change
@@ -51,9 +64,9 @@ export function UserPage (props: IUserPageProps) {
                 Your user data
             </AccordionSummary>
             <AccordionDetails>
-                <Box display="flex"justifyContent="space-between">
+                <Box display="flex" justifyContent="space-between">
                     <Typography>
-                        Username: {userData.user.username}
+                        {/* Username: {userData.user.username} */}
                     </Typography>
                     <Button
                         onClick={() => setChangingUsername(true)}
@@ -64,9 +77,12 @@ export function UserPage (props: IUserPageProps) {
                 </Box>
                 <Box display="flex" marginTop="2vh" justifyContent="space-between">
                     <Typography>
-                        E-mail: {userData.user.email}
+                        {/* E-mail: {userData.user.email} */}
                     </Typography>
-                    <Button variant='contained'>
+                    <Button 
+                        onClick={() => setChangingEmail(true)}
+                        variant='contained'
+                    >
                         Change
                     </Button>
                 </Box>

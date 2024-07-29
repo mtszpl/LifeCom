@@ -22,7 +22,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
 
   React.useEffect(() => {
     setChannels([])
-    navigate("")
+    // navigate("")
     if(props.selectedChatTuple.chat !== undefined)
       getChannels(props.selectedChatTuple.chat.id)
   }, [props.selectedChatTuple])
@@ -53,7 +53,21 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
     })
   }
 
-  const onCreateChannel = () => {
+  const createChannel = (name: string) => {
+    if(props.selectedChatTuple.chat === undefined)
+      return
+    const payload = {
+      chatId: props.selectedChatTuple.chat.id.toString(),
+      name: name
+    }
+    const subscription = HttpClient.post(`${apiUrl}Channels/create`, payload)
+    .subscribe({
+        next() {},
+        error(err: Error) {console.error(err.message)},
+        complete() { 
+            subscription.unsubscribe()
+         }
+    })
     setChannelCreatorOpen(false)
     if(props.selectedChatTuple.chat !== undefined)
       getChannels(props.selectedChatTuple.chat?.id)
@@ -61,7 +75,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
 
   return (
     <Box height="100%" bgcolor={theme.palette.background.default}>
-      <CreateChannelDialog open={channelCreatorOpen} handleCancel={() => {setChannelCreatorOpen(false)}} chatTuple={props.selectedChatTuple} handleReturn={onCreateChannel}/>
+      <CreateChannelDialog open={channelCreatorOpen} handleCancel={() => {setChannelCreatorOpen(false)}} chatTuple={props.selectedChatTuple} handleReturn={createChannel}/>
       <ChannelsSelection channels={channels} role={props.selectedChatTuple.role} handleChannelSelect={handleChannelSelect} startCreatingChannel={startCreatingChannel}/>      
     </Box>
   );

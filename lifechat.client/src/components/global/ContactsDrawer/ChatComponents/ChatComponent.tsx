@@ -38,11 +38,13 @@ export function ChatComponent (props: IChatComponentProps) {
     * Loads chats of logged user
     */
     const getChats = () => {
+        console.log("getting chats");
         const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
         .subscribe(({
             next(response) {
-            // console.log(response)
-            setChats([...response]);
+              console.log("chats");
+              console.log(response)
+              setChats([...response]);
             },
             error(err: Error) { console.error(err.message); },
             complete() {
@@ -71,10 +73,6 @@ export function ChatComponent (props: IChatComponentProps) {
 
     //Getting channels on chat change
     React.useEffect(() => {
-        // setChannels([])
-        // navigate("")
-        if(selectedChatTuple.chat !== undefined)
-        // getChannels(selectedChatTuple.chat.id)
         selectedChatTuple.chat !== undefined ?
             props.chatSelected(selectedChatTuple) :
             props.chatSelected(noChatTuple)

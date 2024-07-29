@@ -1,6 +1,6 @@
 import { Add } from '@mui/icons-material';
 import { FormControl, Box, InputLabel, Select, MenuItem, Typography, Divider, useTheme, SelectChangeEvent } from '@mui/material';
-import Chat from '../../../model/Chat';
+import Chat from '../../../../model/Chat';
 
 export interface IChatSelectorProps {
     chatTuples: {chat: Chat, role: string}[]

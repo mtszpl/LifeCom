@@ -24,9 +24,6 @@ export function Topbar (props: ITopbarProps) {
     const colorMode = useContext(ColorModecontext)
 
     const userData = useSelector(state => state.userData)
-    useEffect(() => {
-      console.log(userData);
-    }, [userData])
 
     const navigate = useNavigate()
 

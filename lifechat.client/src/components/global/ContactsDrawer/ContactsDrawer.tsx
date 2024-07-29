@@ -1,17 +1,8 @@
 import { useTheme } from '@emotion/react';
-import { Add } from '@mui/icons-material';
-import { Box, Drawer, SelectChangeEvent} from '@mui/material';
+import { Drawer} from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import HttpClient from '../../../API/HttpClient';
-import Channel from '../../../model/Channel';
 import Chat from '../../../model/Chat';
-import { useNavigate } from 'react-router-dom';
-import { CreateChatDialog } from './ChatComponents/CreateChatDialog';
 import { DrawerHeader } from './DrawerHeader';
-import { ChatSelector } from './ChatComponents/ChatSelector';
-import { ChannelsSelection } from './ChannelComponents/ChannelsSelection';
-import { CreateChannelDialog } from './ChannelComponents/CreateChannelDialog';
 import { ChatComponent } from './ChatComponents/ChatComponent';
 import { ChannelsComponent } from './ChannelComponents/ChannelsComponent';
 

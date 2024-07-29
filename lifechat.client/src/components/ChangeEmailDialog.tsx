@@ -1,3 +1,4 @@
+import { Dialog, DialogTitle, DialogContent, DialogContentText, TextField, DialogActions, Button } from '@mui/material';
 import * as React from 'react';
 
 export interface IChangeEmailDialogProps {
@@ -10,18 +11,20 @@ export function ChangeEmailDialog (props: IChangeEmailDialogProps) {
     
     const [textfieldData, setTextFieldData] = React.useState<string>("")
 
-    const submit = () => {
+    const submit = (e) => {
+        e.preventDefault()
         props.onSubmit(textfieldData)
     }
-
-    const handleClose = () => {
+    
+    const handleClose = (e) => {
+        e.preventDefault()
         props.onCancel()
     }
 
   return (
     <Dialog
         open={props.open}
-        onClose={() => handleClose()}
+        onClose={(e) => handleClose(e)}
         PaperProps={{
             component: 'form',
             onSubmit: submit
@@ -41,11 +44,12 @@ export function ChangeEmailDialog (props: IChangeEmailDialogProps) {
                 label="New email"
                 fullWidth
                 variant='filled'
+                type="email"
                 onChange={e => setTextFieldData(e.target.value)}
 
                 />
             <DialogActions>
-                <Button variant='contained' onClick={() => handleClose()}>Cancel</Button>
+                <Button variant='contained' onClick={(e) => handleClose(e)}>Cancel</Button>
                 <Button variant='contained' type="submit">Confirm</Button>
             </DialogActions>
         </DialogContent>

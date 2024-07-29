@@ -1,6 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
 import * as React from 'react';
-import HttpClient from '../../../../API/HttpClient';
 import Chat from '../../../../model/Chat';
 
 
@@ -12,8 +11,6 @@ export interface ICreateChannelDialogProps {
 }
 
 export function CreateChannelDialog (props: ICreateChannelDialogProps) {
-    const chatsUrl: string = "https://localhost:7078/api/Channels/create"
-
 
     function handleClose(): void {
         props.handleCancel()
@@ -28,25 +25,11 @@ export function CreateChannelDialog (props: ICreateChannelDialogProps) {
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries((formData as any).entries());
         const name = formJson.chatName
-        if(name === undefined || props.chatTuple.chat === undefined){
-            handleClose()
-            return
-        }
-        const payload = {
-            chatId: props.chatTuple.chat.id,
-            name: name
-        }
-        const subscription = HttpClient.post(chatsUrl, payload)
-            .subscribe({
-                next() {},
-                error(err: Error) {console.error(err.message)},
-                complete() { 
-                    subscription.unsubscribe()
-                    
-                    if(props.handleReturn !== undefined) 
-                        props.handleReturn(name)
-                 }
-            })
+        if(name === undefined || props.chatTuple.chat === undefined)
+            handleClose()        
+        else
+            props.handleReturn(name)
+
     }
 
   return (

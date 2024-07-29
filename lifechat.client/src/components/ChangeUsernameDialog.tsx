@@ -11,18 +11,20 @@ export function ChangeUsernameDialog (props: IChangeUsernameDialogProps) {
 
     const [textfieldData, setTextFieldData] = React.useState<string>("")
 
-    const submit = () => {
+    const submit = (e) => {
+        e.preventDefault()
         props.onSubmit(textfieldData)
     }
-
-    const handleClose = () => {
+    
+    const handleClose = (e) => {
+        e.preventDefault()
         props.onCancel()
     }
 
   return (
     <Dialog
         open={props.open}
-        onClose={() => handleClose()}
+        onClose={(e) => handleClose(e)}
         PaperProps={{
             component: 'form',
             onSubmit: submit
@@ -46,7 +48,7 @@ export function ChangeUsernameDialog (props: IChangeUsernameDialogProps) {
 
                 />
             <DialogActions>
-                <Button variant='contained' onClick={() => handleClose()}>Cancel</Button>
+                <Button variant='contained' onClick={(e) => handleClose(e)}>Cancel</Button>
                 <Button variant='contained' type="submit">Confirm</Button>
             </DialogActions>
         </DialogContent>
