@@ -25,7 +25,8 @@ namespace LifeCom.Server.Chats.Channels
 
         public List<Channel> GetByChatOfUser(int chatId, int userId)
         {
-            return _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
+            var retList = _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
+            return retList;
         }
 
         public Task<Channel?> GetByIdAsync(int? id)
@@ -61,6 +62,32 @@ namespace LifeCom.Server.Chats.Channels
             else
                 return false;
             return true;
+        }
+
+        public Channel? CreteChannel(int chatId, string name, int? creatorId)
+        {
+            User? creator = _context.Users.FirstOrDefault(u => u.Id == creatorId);
+            if (creator == null)
+                return null;             
+            
+            Channel channel = new Channel
+            {
+                chatId = chatId,
+                name = name,
+                members = new List<User> { creator }
+            };
+            if(!ChannelOfNameExists(chatId, name))
+            {
+                _context.Add(channel);
+                _context.SaveChanges();
+                return channel;
+            }    
+            return null;
+        }
+
+        public bool ChannelOfNameExists(int chatId, string channelName)
+        {
+            return _context.Channel.Join(_context.Chat, cn => cn.chatId, ch => ch.Id, (cn, chatId) => cn).Any(e => e.name == channelName);
         }
 
         public bool ChannelExists(int id)

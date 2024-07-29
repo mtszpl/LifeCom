@@ -50,30 +50,27 @@ namespace LifeCom.Server.Chats.Channels
             if (userId == null)
                 return NotFound("User not found");
 
-            return _channelService.GetByChatOfUser(chatId, (int)userId); ;
+            return _channelService.GetByChatOfUser(chatId, (int)userId);
         }
 
         [HttpPost("create")]
         [Authorize(Policy = "ChatAdmin")]
-        public ActionResult CreateChannel([FromBody]int chatId, [FromBody]string name)
+        public ActionResult CreateChannel(int atChat, [FromBody]ChannelRequest request)
         {
             Console.WriteLine("Creting channel");
-            Chat? owningChat = _chatService.GetById(chatId);
+
+            Chat? owningChat = _chatService.GetById(request.chatId);
             if(owningChat == null)
                 return NotFound("Chat not found");
 
             int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
             if (userId == null)
                 return NotFound("User not found");
-
-            Channel channel = new Channel 
-            {
-                name = name,
-                chat = owningChat,
-                members = new List<User> { }
-            };
-
-            return Ok(channel);
+            Channel? channel = _channelService.CreteChannel(request.chatId, request.name, userId);
+            if (channel != null)
+                return Ok(channel);
+            else
+                return BadRequest("Unsuccesful");
         }
 
         [HttpPost("user")]

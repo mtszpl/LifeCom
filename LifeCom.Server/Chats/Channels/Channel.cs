@@ -12,7 +12,7 @@ namespace LifeCom.Server.Chats.Channels
 
         public List<User> members { get; set; } = [];
         public int chatId { get; set; }
-        public required Chat chat { get; set; } = null!;
+        public Chat chat { get; set; } = null!;
 
     }
 }
