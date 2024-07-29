@@ -44,14 +44,24 @@ namespace LifeCom.Server.Users
             return _context.SaveChangesAsync();
         }
 
-        public bool ChangeUsername(int? id, string newName)
+        public User? ChangeUsername(int? id, string newName)
         {
             User? user = GetById(id);
             if (user == null)
-                return false;
+                return user;
             user.username = newName;
-            _context.SaveChanges();
-            return true;
+            //_context.SaveChanges();
+            return user;
+        }
+
+        public User? ChangeEmail(int? id, string newEmail)
+        {
+            User? user = GetById(id);
+            if (user == null)
+                return user;
+            user.email = newEmail;
+            //_context.SaveChanges();
+            return user;
         }
 
         public bool UserExists(int id)

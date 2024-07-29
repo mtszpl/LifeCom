@@ -70,11 +70,23 @@ namespace LifeCom.Server.Users
         }
 
         [HttpPut("username")]
-        public ActionResult ChangeUsername([FromBody] string newName)
+        public ActionResult<UserResponse> ChangeUsername([FromBody] string newName)
         {
             int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (_userService.ChangeUsername(id, newName))
-                return Ok("Username changed!");
+            User? user = _userService.ChangeUsername(id, newName);
+            if (user != null)
+                return Ok(new UserResponse(user));
+            else
+                return BadRequest("Error occured");
+        }
+
+        [HttpPut("email")]
+        public ActionResult ChangeEmail([FromBody] string newEmail)
+        {
+            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            User? user = _userService.ChangeEmail(id, newEmail);
+            if (user != null)
+                return Ok(new UserResponse(user));
             else
                 return BadRequest("Error occured");
         }
