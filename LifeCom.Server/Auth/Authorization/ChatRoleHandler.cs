@@ -41,16 +41,16 @@ namespace LifeCom.Server.Auth.Authorization
             if (_httpContextAccessor.HttpContext == null)
                 return Task.CompletedTask;
 
-            using StreamReader reader = new StreamReader(_httpContextAccessor.HttpContext.Request.Body);
-            string queryParams = reader.ReadToEndAsync().Result;
-  
-            ChatAuthData? requestBody = JsonConvert.DeserializeObject<ChatAuthData>(queryParams);
-            if (requestBody == null)
+            string? chatIdString = _httpContextAccessor.HttpContext.Request.Query["atChat"];
+            if (chatIdString == null)
                 return Task.CompletedTask;
+            int chatId = int.Parse(chatIdString);
 
 
-            UserChat? userChat = _context.UserChats.FirstOrDefault(u => u.userId == id && u.chatId == requestBody.chatId);
-            if (userChat == null) return Task.CompletedTask;
+
+            UserChat? userChat = _context.UserChats.FirstOrDefault(u => u.userId == id && u.chatId == chatId);
+            if (userChat == null)
+                return Task.CompletedTask;
 
             if (userChat.role == ERole.Admin.ToString())
                 context.Succeed(requirement);
