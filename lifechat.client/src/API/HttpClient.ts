@@ -105,7 +105,7 @@ export default class HttpClient {
         else 
             params.withCredentials = true
         
-        const axiosPromise = HttpClient.API.post(url, payload, params,)
+        const axiosPromise = HttpClient.API.post(url, payload, params)
         return from(axiosPromise.then(response => {
             return response.data;
         }).catch(error => {
@@ -114,6 +114,29 @@ export default class HttpClient {
             } else {
                 throw new Error(error.message)
             }
+        }))
+    }
+
+    /**
+     * Executes put method
+     * @param url Endpoint url
+     * @param payload Request payload
+     * @param params Request parameters, default withCredentials with content-type "application/json"
+     * @returns Observable with data from call or error message if occured
+     */
+    static put = (url: string, payload: any, params: any = undefined) => {
+        if(params === undefined)
+            params = {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            }
+        else 
+            params.withCredentials = true
+        const axiosPromise = HttpClient.API.put(url, payload, params)
+        return from(axiosPromise.then(response => {
+            console.log(response);
         }))
     }
 
