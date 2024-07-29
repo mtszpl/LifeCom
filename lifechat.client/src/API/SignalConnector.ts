@@ -22,6 +22,14 @@ export class SignalConnector {
 
         this.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(`fug, ${e}`))
 
+        if(this.connection !== undefined) {
+            this.connection.onreconnecting((e) => {
+                console.error(e?.message)
+                alert("Lost connection to server, the site will now refresh")
+                location.reload()
+            })
+        }
+
     }
 
     onReceiveMessage(callback: () => void) {
