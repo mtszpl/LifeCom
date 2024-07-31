@@ -25,8 +25,7 @@ namespace LifeCom.Server.Chats.Channels
 
         public List<Channel> GetByChatOfUser(int chatId, int userId)
         {
-            var retList = _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
-            return retList;
+            return _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
         }
 
         public Task<Channel?> GetByIdAsync(int? id)

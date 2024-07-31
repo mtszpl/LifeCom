@@ -5,8 +5,6 @@ import { tokens } from '../Theme';
 import { useState } from 'react';
 import HttpClient from '../API/HttpClient';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { setToken } from '../store/slices/UserSlice';
 import LoginUtils from '../utility/LoginUtils';
 
 export function RegisterPage () {
