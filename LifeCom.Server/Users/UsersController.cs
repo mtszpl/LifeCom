@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Data;
-using Microsoft.AspNet.SignalR;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using LifeCom.Server.Models;
 
@@ -56,17 +56,27 @@ namespace LifeCom.Server.Users
         }
 
         [HttpPut("image")]
-        public async Task<ActionResult> UploadImage([FromBody] IFormFile imageFile)
+        public async Task<IActionResult> UploadImage(IFormFile imageFile)
+        {
+            if (imageFile == null)
+                return NotFound("No payload");
+            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+            if (_userService.SetProfilePic(id, imageFile))
+                return Ok();
+            else return NotFound("User not found");
+        }
+
+        [HttpDelete("image")]
+        public ActionResult DeleteProfileImage()
         {
             int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
             User? toChange = _userService.GetById(id);
             if (toChange == null)
                 return NotFound("User not found");
-            using MemoryStream stream = new MemoryStream();
-            await imageFile.CopyToAsync(stream);
-            byte[] imageBytes = stream.ToArray();
-            toChange.profilePic = imageBytes;
-            return Ok();
+            toChange.profilePic = [];
+            if(_userService.ResetProfilePic(id))
+                return Ok();
+            else return NotFound("User not found");
         }
 
         [HttpPut("username")]

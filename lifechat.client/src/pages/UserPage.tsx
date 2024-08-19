@@ -3,9 +3,10 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Typography 
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import defaultAvatar from '../assets/defaultAvatar.png';
-import { ChangeUsernameDialog } from '../components/ChangeUsernameDialog';
-import { ChangeEmailDialog } from '../components/ChangeEmailDialog';
+import { ChangeUsernameDialog } from '../components/dialogs/ChangeUsernameDialog';
+import { ChangeEmailDialog } from '../components/dialogs/ChangeEmailDialog';
 import HttpClient from '../API/HttpClient';
+import { ChangeProfilePicDialog } from '../components/dialogs/ChangeProfilePicDialog';
 
 export interface IUserPageProps {
 }
@@ -18,11 +19,24 @@ export function UserPage (props: IUserPageProps) {
         console.log(userData.user);
     }, [userData])
 
+    const [changingProfilePic, setChangingProfilePic] = React.useState<boolean>(false)
     const [changingUsername, setChangingUsername] = React.useState<boolean>(false)
     const [changingEmail, setChangingEmail] = React.useState<boolean>(false)
 
     const url: string = "https://localhost:7078/api/Users"
     
+    const changeProfilePic = (newProfilePic: File | undefined) => {
+        console.log(newProfilePic);
+        if(newProfilePic === undefined)
+            return
+        setChangingUsername(false)
+        HttpClient.put(`${url}/image`, newProfilePic)
+    }
+
+    const deleteProfilePic = () => {
+
+    }
+
     const changeUsername = (newUsername: string) => {
         setChangingUsername(false)
         console.log(`changing username: ${newUsername}`);
@@ -32,7 +46,6 @@ export function UserPage (props: IUserPageProps) {
     const changeEmail = (newEmail: string) => {
         setChangingEmail(false)
         console.log(`changing email to: ${newEmail}`);
-
     }
 
   return (
@@ -41,7 +54,7 @@ export function UserPage (props: IUserPageProps) {
             User settings
         </Typography>
         <Typography variant='h1'>
-            {/* {userData !== undefined ? userData.user.username : null} */}
+            {userData !== undefined ? userData.user.username : null}
         </Typography>
         <Box
             sx={{
@@ -49,14 +62,14 @@ export function UserPage (props: IUserPageProps) {
                 aspectRatio: 1
             }}
           component="img"
-        //   src={
-        //     (userData !== undefined &&
-        //     userData.user.profilePic !== "") ?
-        //         userData.user.profilePic :
-        //         defaultAvatar
-        //   }
+          src={
+            (userData !== undefined &&
+            userData.user.profilePic !== "") ?
+                userData.user.profilePic :
+                defaultAvatar
+          }
         />
-        <Button variant="contained">
+        <Button variant="contained" onClick={() => setChangingProfilePic(true)}>
             Change
         </Button>
         <Accordion sx={{ width: "100%"}}>
@@ -66,7 +79,7 @@ export function UserPage (props: IUserPageProps) {
             <AccordionDetails>
                 <Box display="flex" justifyContent="space-between">
                     <Typography>
-                        {/* Username: {userData.user.username} */}
+                        Username: {userData.user.username}
                     </Typography>
                     <Button
                         onClick={() => setChangingUsername(true)}
@@ -77,7 +90,7 @@ export function UserPage (props: IUserPageProps) {
                 </Box>
                 <Box display="flex" marginTop="2vh" justifyContent="space-between">
                     <Typography>
-                        {/* E-mail: {userData.user.email} */}
+                        E-mail: {userData.user.email}
                     </Typography>
                     <Button 
                         onClick={() => setChangingEmail(true)}
@@ -90,6 +103,7 @@ export function UserPage (props: IUserPageProps) {
         </Accordion>
         <ChangeUsernameDialog open={changingUsername} onSubmit={changeUsername} onCancel={() => setChangingUsername(false)}/>
         <ChangeEmailDialog open={changingEmail} onSubmit={changeEmail} onCancel={() => setChangingEmail(false)}/>
+        <ChangeProfilePicDialog open={changingProfilePic} onSubmit={changeProfilePic} onDelete={deleteProfilePic} onCancel={() => setChangingProfilePic(false)}/>
     </Box>
   );
 }

@@ -40,9 +40,12 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   * @param chatId Id of selected chat
   */
   const getChannels = (chatId: number) => {
+    console.log(chatId);
     const channelsSubscription = HttpClient.get(`${apiUrl}Channels/bychat?chatId=${chatId}`)
     .subscribe({
       next(response) {
+        console.log("channels")
+        console.log(response)
         if(response !== undefined)
           setChannels(response)
       },
@@ -56,21 +59,22 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   const createChannel = (name: string) => {
     if(props.selectedChatTuple.chat === undefined)
       return
+    const chatId = props.selectedChatTuple.chat.id
     const payload = {
-      chatId: props.selectedChatTuple.chat.id.toString(),
+      chatId: chatId,
       name: name
     }
-    const subscription = HttpClient.post(`${apiUrl}Channels/create`, payload)
+    const subscription = HttpClient.post(`${apiUrl}Channels/create?atChat=${chatId}`, payload)
     .subscribe({
         next() {},
         error(err: Error) {console.error(err.message)},
         complete() { 
             subscription.unsubscribe()
+            if(props.selectedChatTuple.chat !== undefined)
+              getChannels(props.selectedChatTuple.chat?.id)
          }
     })
     setChannelCreatorOpen(false)
-    if(props.selectedChatTuple.chat !== undefined)
-      getChannels(props.selectedChatTuple.chat?.id)
   }
 
   return (
