@@ -14,11 +14,6 @@ export interface IUserPageProps {
 export function UserPage (props: IUserPageProps) {
     const userData = useSelector(store => store.userData)
 
-    React.useEffect(() => {
-        console.log(userData);
-        console.log(userData.user);
-    }, [userData])
-
     const [changingProfilePic, setChangingProfilePic] = React.useState<boolean>(false)
     const [changingUsername, setChangingUsername] = React.useState<boolean>(false)
     const [changingEmail, setChangingEmail] = React.useState<boolean>(false)
@@ -26,11 +21,27 @@ export function UserPage (props: IUserPageProps) {
     const url: string = "https://localhost:7078/api/Users"
     
     const changeProfilePic = (newProfilePic: File | undefined) => {
-        console.log(newProfilePic);
-        if(newProfilePic === undefined)
+        if(newProfilePic === undefined) {
+            // HttpClient
             return
+        }
+        const formData = new FormData()
+        formData.append(`file`, newProfilePic)
+        for(const key of formData.entries())
+            console.log(key);
+        const subscription = HttpClient.put(`${url}/image`, formData,
+            {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            }
+        )
+        .subscribe({
+                next: (response) => {console.log(response);},
+                complete: () => { subscription.unsubscribe() }
+            })
         setChangingUsername(false)
-        HttpClient.put(`${url}/image`, newProfilePic)
     }
 
     const deleteProfilePic = () => {
@@ -54,21 +65,21 @@ export function UserPage (props: IUserPageProps) {
             User settings
         </Typography>
         <Typography variant='h1'>
-            {userData !== undefined ? userData.user.username : null}
+            {(userData !== undefined && userData.user !== undefined) ?? userData.user.username}
         </Typography>
         <Box
-            sx={{
-                width: "20vh",
-                aspectRatio: 1
-            }}
-          component="img"
-          src={
-            (userData !== undefined &&
+        sx={{
+            width: "20vh",
+            aspectRatio: 1
+        }}
+        component="img"
+        src={
+            (userData !== undefined && userData.user !== undefined &&
             userData.user.profilePic !== "") ?
-                userData.user.profilePic :
-                defaultAvatar
-          }
-        />
+            userData.user.profilePic :
+            defaultAvatar
+        }
+        />        
         <Button variant="contained" onClick={() => setChangingProfilePic(true)}>
             Change
         </Button>
@@ -79,7 +90,7 @@ export function UserPage (props: IUserPageProps) {
             <AccordionDetails>
                 <Box display="flex" justifyContent="space-between">
                     <Typography>
-                        Username: {userData.user.username}
+                        Username: {(userData !== undefined && userData.user !== undefined) ?? userData.user.username}
                     </Typography>
                     <Button
                         onClick={() => setChangingUsername(true)}
@@ -90,7 +101,7 @@ export function UserPage (props: IUserPageProps) {
                 </Box>
                 <Box display="flex" marginTop="2vh" justifyContent="space-between">
                     <Typography>
-                        E-mail: {userData.user.email}
+                        E-mail: {(userData !== undefined && userData.user !== undefined) ?? userData.user.email}
                     </Typography>
                     <Button 
                         onClick={() => setChangingEmail(true)}

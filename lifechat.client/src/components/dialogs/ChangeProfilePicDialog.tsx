@@ -14,12 +14,13 @@ export function ChangeProfilePicDialog (props: IChangeProfilePicDialogProps) {
 
     const submit = (e) => {
         e.preventDefault()
-        console.log(typeof image);
         props.onSubmit(image)
+        setImage(undefined)
     }
     
     const handleClose = (e) => {
         e.preventDefault()
+        setImage(undefined)
         props.onCancel()
     }
 
@@ -27,10 +28,9 @@ export function ChangeProfilePicDialog (props: IChangeProfilePicDialogProps) {
         const file: File = e.target.files[0]
         if(file === undefined)
             return
-        console.log(typeof file);
         // setImage(URL.createObjectURL(file))
-        setImage(file)
         console.log(file);
+        setImage(file)
     }
 
 

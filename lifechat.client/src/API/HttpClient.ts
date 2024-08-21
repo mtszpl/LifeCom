@@ -104,7 +104,7 @@ export default class HttpClient {
             }
         else 
             params.withCredentials = true
-        
+        console.log(payload)
         const axiosPromise = HttpClient.API.post(url, payload, params)
         return from(axiosPromise.then(response => {
             return response.data;

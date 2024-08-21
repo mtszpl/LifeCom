@@ -25,8 +25,6 @@ export function ChatComponent (props: IChatComponentProps) {
 
     const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
 
-    const navigate = useNavigate()
-
     React.useEffect(() => {
         if(!isLoggedIn)
           return
@@ -38,12 +36,9 @@ export function ChatComponent (props: IChatComponentProps) {
     * Loads chats of logged user
     */
     const getChats = () => {
-        console.log("getting chats");
         const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
         .subscribe(({
             next(response) {
-              console.log("chats");
-              console.log(response)
               setChats([...response]);
             },
             error(err: Error) { console.error(err.message); },

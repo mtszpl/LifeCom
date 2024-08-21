@@ -55,13 +55,19 @@ namespace LifeCom.Server.Users
             return users;
         }
 
-        [HttpPut("image")]
-        public async Task<IActionResult> UploadImage(IFormFile imageFile)
+        public class ImageDTO
         {
-            if (imageFile == null)
+            public string name { get; set; }
+            public IFormFile image { get; set; }
+        }
+
+        [HttpPut("image")]
+        public ActionResult UploadImage(IFormFile file)
+        {
+            if (file == null)
                 return NotFound("No payload");
             int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (_userService.SetProfilePic(id, imageFile))
+            if (_userService.SetProfilePic(id, file))
                 return Ok();
             else return NotFound("User not found");
         }
