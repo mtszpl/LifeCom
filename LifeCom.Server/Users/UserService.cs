@@ -50,7 +50,7 @@ namespace LifeCom.Server.Users
             if (user == null)
                 return user;
             user.username = newName;
-            //_context.SaveChanges();
+            _context.SaveChanges();
             return user;
         }
 
@@ -60,32 +60,8 @@ namespace LifeCom.Server.Users
             if (user == null)
                 return user;
             user.email = newEmail;
-            //_context.SaveChanges();
+            _context.SaveChanges();
             return user;
-        }
-
-        public bool SetProfilePic(int? userId, IFormFile imageFile)
-        {
-            User? toChange = GetById(userId);
-            if (toChange == null)
-                return false;
-            using MemoryStream stream = new MemoryStream();
-            imageFile.CopyTo(stream);
-            byte[] imageByte = stream.ToArray();
-            toChange.profilePic = imageByte;
-            _context.SaveChanges();
-            return true;
-
-        }
-
-        public bool ResetProfilePic(int? userId)
-        {
-            User? toChange = GetById(userId);
-            if(toChange == null)
-                return false;
-            toChange.profilePic = [];
-            _context.SaveChanges();
-            return true;
         }
 
         public bool UserExists(int id)

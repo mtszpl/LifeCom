@@ -10,7 +10,6 @@ namespace LifeCom.Server.Users
         public required string passwordHash { get; set; } = string.Empty;
         public string password { get; set; } = string.Empty;
         public string email { get; set; } = string.Empty;
-        public byte[] profilePic { get; set; } = [];
         public string refreshToken {  get; set; } = string.Empty;
         public DateTime refreshExpirationTime { get; set; }
 

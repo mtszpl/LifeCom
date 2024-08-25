@@ -61,30 +61,6 @@ namespace LifeCom.Server.Users
             public IFormFile image { get; set; }
         }
 
-        [HttpPut("image")]
-        public ActionResult UploadImage(IFormFile file)
-        {
-            if (file == null)
-                return NotFound("No payload");
-            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (_userService.SetProfilePic(id, file))
-                return Ok();
-            else return NotFound("User not found");
-        }
-
-        [HttpDelete("image")]
-        public ActionResult DeleteProfileImage()
-        {
-            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            User? toChange = _userService.GetById(id);
-            if (toChange == null)
-                return NotFound("User not found");
-            toChange.profilePic = [];
-            if(_userService.ResetProfilePic(id))
-                return Ok();
-            else return NotFound("User not found");
-        }
-
         [HttpPut("username")]
         public ActionResult<UserResponse> ChangeUsername([FromBody] string newName)
         {

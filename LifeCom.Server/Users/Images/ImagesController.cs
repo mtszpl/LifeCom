@@ -4,10 +4,7 @@ using LifeCom.Server.Users.Images;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Net.Http.Headers;
-using System.Net.Mime;
 using System.Security.Claims;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LifeCom.Server.Users.Pictures
 {
@@ -41,7 +38,7 @@ namespace LifeCom.Server.Users.Pictures
             Image? image = _lifeComContext.Images.FirstOrDefault(i => i.userId == id);
             if (image == null)
                 return Ok(null);
-            return Ok(image.data);
+            return Ok(Convert.ToBase64String(image.data));
         }
 
         [HttpGet("{id}")]
@@ -84,6 +81,7 @@ namespace LifeCom.Server.Users.Pictures
                 _lifeComContext.Images.Add(newImage);
             else
                 currentImage.Copy(newImage);
+            _lifeComContext.SaveChanges();
             string base64 = Convert.ToBase64String(imageByte);
             return Ok(base64);
 
@@ -118,13 +116,12 @@ namespace LifeCom.Server.Users.Pictures
         public ActionResult DeleteProfileImage()
         {
             int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            User? toChange = _userService.GetById(id);
-            if (toChange == null)
+            Image? image = _lifeComContext.Images.FirstOrDefault(x => x.userId == id);
+            if (image == null)
                 return NotFound("User not found");
-            //toChange.profilePic = [];
-            //if (_userService.ResetProfilePic(id))
-                return Ok();
-            //else return NotFound("User not found");
+            _lifeComContext.Images.Remove(image);
+            _lifeComContext.SaveChanges();
+            return Ok();
         }
     }
 }
