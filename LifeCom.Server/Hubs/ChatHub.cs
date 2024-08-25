@@ -15,8 +15,6 @@ namespace LifeCom.Server.Hubs
     {
         private readonly LifeComContext _context;
 
-        private Dictionary<int, string> connections = new Dictionary<int, string>();
-
         public ChatHub(LifeComContext context)
         {
             _context = context;
@@ -64,8 +62,5 @@ namespace LifeCom.Server.Hubs
         {
             await Clients.All.ReceiveMessage(new UserResponse(author), message);
         }
-
-        public async Task CreateChannel()
-        { }
     }
 }
