@@ -104,7 +104,6 @@ export default class HttpClient {
             }
         else 
             params.withCredentials = true
-        console.log(payload)
         const axiosPromise = HttpClient.API.post(url, payload, params)
         return from(axiosPromise.then(response => {
             return response.data;
@@ -125,8 +124,6 @@ export default class HttpClient {
      * @returns Observable with data from call or error message if occured
      */
     static put = (url: string, payload: any, params: any = undefined) => {
-        console.log("payload");
-        console.log(payload);
         if(params === undefined)
             params = {
                 withCredentials: true,
@@ -136,10 +133,16 @@ export default class HttpClient {
             }
         else 
             params.withCredentials = true
-        console.log(payload);
         const axiosPromise = HttpClient.API.put(url, payload, params)
         return from(axiosPromise.then(response => {
-            console.log(response);
+            return response.data
+        }))
+    }
+    
+    static delete = (url: string, payload: any =  undefined) => {
+        const axiosPromise = HttpClient.API.delete(url, payload)
+        return from(axiosPromise.then(response => {
+            return response
         }))
     }
 
