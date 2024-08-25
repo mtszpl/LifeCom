@@ -1,15 +1,13 @@
 import axios from "axios";
 import store from "../store/store";
-import LoginUtils from "../utility/LoginUtils";
 import HttpClient from "./HttpClient";
-import { from } from "rxjs";
 
 export default class Inteceptors {
 
     static addedRequestInerceptors = []
     static addedResponseInerceptors = []
 
-    private static authInterceptor: number | undefined
+    private static authInterceptorHandle: number | undefined
     private static authUrls = ['/login', '/register']
     
     private static refreshInterceptor: number | undefined
@@ -20,7 +18,7 @@ export default class Inteceptors {
     }
 
     static addAuthInterceptor = (key?: string) => {
-        if(this.authInterceptor !== undefined){
+        if(this.authInterceptorHandle !== undefined){
             console.error("Auth interceptor already added")
             return
         }
@@ -29,26 +27,30 @@ export default class Inteceptors {
             token = localStorage.getItem(key)
         else
             token = store.getState().userData.token
-        this.authInterceptor = HttpClient.addRequestInterceptor((config) => {
-            if(this.authUrls.some(url => config.url.includes(url)))
-                return config
-            if(token)
-                config.headers.Authorization = `Bearer ${token}`
-            return config
-        })
+        this.authInterceptorHandle = HttpClient.addRequestInterceptor(config => Inteceptors.authInterceptor(config, token))
 
-        this.addedRequestInerceptors.push(this.authInterceptor)
+        this.addedRequestInerceptors.push(this.authInterceptorHandle)
 
         this.addRefreshInterceptor()
     }
 
+    private static authInterceptor = (config, token) => {
+        if(this.authUrls.some(url => config.url.includes(url)))
+            return config
+        if(token){
+            config.headers.Authorization = `Bearer ${token}`
+        }
+        return config        
+    }
+
     static removeAuthInterceptor = () => {
-        if(this.authInterceptor === undefined){
+        console.log("removing auth");
+        if(this.authInterceptorHandle === undefined){
             console.error("No auth interceptor")
             return
         }
-        HttpClient.removeRequestInterceptor(this.authInterceptor)
-        this.authInterceptor = undefined
+        HttpClient.removeRequestInterceptor(this.authInterceptorHandle)
+        this.authInterceptorHandle = undefined
     }
     
     static addRefreshInterceptor() {
