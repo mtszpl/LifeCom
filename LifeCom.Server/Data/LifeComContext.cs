@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Chats;
 using LifeCom.Server.Chats.Messages;
 using LifeCom.Server.Chats.Channels;
+using LifeCom.Server.Users.Images;
 
 namespace LifeCom.Server.Data
 {
@@ -35,5 +36,6 @@ namespace LifeCom.Server.Data
         public DbSet<Chat> Chat { get; set; } = default!;
         public DbSet<UserChat> UserChats { get; set; } = default;
         public DbSet<Channel> Channel { get; set; } = default!;
+        public DbSet<Image> Images { get; set; } = default;
     }
 }

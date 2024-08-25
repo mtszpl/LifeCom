@@ -32,7 +32,6 @@ namespace LifeCom.Server.Models
                     password = "IamStupid1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("IamStupid1!"),
                     email = "charles.legreg@ferrari.it",
-                    profilePic = [],
                     chats = new List<Chat> { ferrariChat },
                     channels = new List<Channel> { driversChannel }
                 };
@@ -42,7 +41,6 @@ namespace LifeCom.Server.Models
                     password = "SmoothOperator1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("SmoothOperator1!"),
                     email = "carlos.sainz@ferrari.it",
-                    profilePic = [],
                     chats = new List<Chat> { ferrariChat },
                     channels = new List<Channel> { driversChannel }
                 };
@@ -52,7 +50,6 @@ namespace LifeCom.Server.Models
                     password = "Bwoah1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("Bwoah1!"),
                     email = "kimi.raikkonen@alfa.ch",
-                    profilePic = [],
                     chats = new List<Chat> { ferrariChat },
                     channels = new List<Channel> { formerDriversChannel }
                 };       
@@ -62,7 +59,6 @@ namespace LifeCom.Server.Models
                     password = "Sbinalla1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("Sbinalla1!"),
                     email = "sebastian.vettel@astonmartin.uk",
-                    profilePic = [],
                     chats = new List<Chat> { ferrariChat },
                     channels = new List<Channel> { formerDriversChannel }
                 };
@@ -72,7 +68,6 @@ namespace LifeCom.Server.Models
                     password = "ProntoLegreg1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("ProntoLegreg1!"),
                     email = "mattia.binotto@ferrari.it",
-                    profilePic = [],
                     chats = new List<Chat> { ferrariChat },
                     channels = new List<Channel> { driversChannel, formerDriversChannel }
                 };
