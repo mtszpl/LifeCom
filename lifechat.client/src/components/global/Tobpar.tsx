@@ -1,15 +1,15 @@
 import { useTheme } from '@emotion/react';
 import { ColorModecontext, tokens } from '../../Theme';
 import { AppBar, Box, Button, IconButton, Typography } from '@mui/material';
-import { AccountCircle, BrightnessHigh, BrightnessLowOutlined } from '@mui/icons-material';
+import { BrightnessHigh, BrightnessLowOutlined } from '@mui/icons-material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo_white.png'
 import { useSelector } from 'react-redux';
 import Interceptors from '../../API/Interceptors';
 import LoginUtils from '../../utility/LoginUtils';
-import defaultAvatar from '../../assets/defaultAvatar.png';
+import { ProfilePicture } from '../ProfilePicture';
 
 export interface ITopbarProps {
   drawerWidth: number
@@ -62,23 +62,21 @@ export function Topbar (props: ITopbarProps) {
             >
             Log out
           </Button>
-          <Box
-            component="img"
-            width="1.7vw"
-            marginX="1vw"
+
+          <ProfilePicture
             sx={{
+              width: `2.3vw`,
+              marginX: "1vw",
               aspectRatio: 1,
               ':hover': {
                 cursor: 'pointer'
               }
             }}
-            src={defaultAvatar}
             onClick={() => {
               userData.loggedIn ?
                 navigate(`user`) :
                 navigate(`/login`)
-            }}
-            />
+            }}/>        
           <Typography variant="h3">
             { userData.loggedIn ? userData.user.username : ""}
           </Typography>
