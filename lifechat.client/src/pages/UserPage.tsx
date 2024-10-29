@@ -8,7 +8,9 @@ import HttpClient from '../API/HttpClient';
 import { ChangeProfilePicDialog } from '../components/dialogs/ChangeProfilePicDialog';
 import { ProfilePicture } from '../components/ProfilePicture';
 import { setProfilePicture } from '../store/slices/ProfilePictureSlice';
+import { setUsername, setEmail } from '../store/slices/UserSlice';
 import { first } from 'rxjs';
+import { setUser } from '../store/slices/UserSlice';
 
 export interface IUserPageProps {
 }
@@ -24,7 +26,7 @@ export function UserPage (props: IUserPageProps) {
 
     const userUrl: string = "https://localhost:7078/api/Users"
     const imagesUrl: string = "https://localhost:7078/api/Images"
-    
+
     const changeProfilePic = (newProfilePic: File | undefined) => {
         if(newProfilePic === undefined) {
             deleteProfilePic()
@@ -46,23 +48,25 @@ export function UserPage (props: IUserPageProps) {
                 },
                 complete: () => { subscription.unsubscribe() }
             })
-        setChangingUsername(false)
+        setChangingProfilePic(false)
     }
 
     const deleteProfilePic = () => {
         HttpClient.delete(imagesUrl).pipe(first())
             .subscribe(() => dispatch(setProfilePicture(undefined)))
+        setChangingProfilePic(false)            
     }
 
     const changeUsername = (newUsername: string) => {
         setChangingUsername(false)
-        console.log(`changing username: ${newUsername}`);
         HttpClient.put(`${userUrl}/username`, newUsername)
+        dispatch(setUsername(newUsername))
     }
     
     const changeEmail = (newEmail: string) => {
         setChangingEmail(false)
-        console.log(`changing email to: ${newEmail}`);
+        HttpClient.put(`${userUrl}/email`, newEmail)
+        dispatch(setEmail(newEmail))
     }
 
   return (

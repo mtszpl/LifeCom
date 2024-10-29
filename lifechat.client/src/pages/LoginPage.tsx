@@ -33,16 +33,9 @@ export function LoginPage () {
       setRememberMe(!rememberMe)
     }
 
-    React.useEffect(() => {
-      console.log(rememberMe);
-    }, [rememberMe])
-
     const loginUrl: string = `https://localhost:7078/api/Auth/login`
     const reroute = useNavigate()
-
-    const user = useSelector(state => state.user)
-    const dispatch = useDispatch()
-
+    
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>{
       setLoginString(e.target.value)
       if(e.target.validity.valid)

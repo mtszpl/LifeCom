@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LifeCom.Server", "LifeCom.Server\LifeCom.Server.csproj", "{6A2D5BC7-5272-4F22-A4F0-70686C2178FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7561AE7B-A050-4A80-BF0D-461E3FB46B9D} = {7561AE7B-A050-4A80-BF0D-461E3FB46B9D}
+	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "lifecom.client", "lifechat.client\lifecom.client.esproj", "{7561AE7B-A050-4A80-BF0D-461E3FB46B9D}"
 EndProject

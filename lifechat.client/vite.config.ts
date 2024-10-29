@@ -6,11 +6,14 @@ import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 
-const baseFolder =
+
+const baseFolder = 
     process.env.APPDATA !== undefined && process.env.APPDATA !== ''
         ? `${process.env.APPDATA}/ASP.NET/https`
         : `${process.env.HOME}/.aspnet/https`;
 
+// console.log(process.env.HOME)
+console.log(baseFolder)
 const certificateArg = process.argv.map(arg => arg.match(/--name=(?<value>.+)/i)).filter(Boolean)[0];
 const certificateName = certificateArg ? certificateArg.groups.value : "lifechat.client";
 
