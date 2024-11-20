@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Channel from '../../../../model/Channel';
 import { ChannelsSelection } from './ChannelsSelection';
-import { CreateChannelDialog } from './CreateChannelDialog';
 import { useNavigate } from 'react-router-dom';
 import Chat from '../../../../model/Chat';
 import HttpClient from '../../../../API/HttpClient';
 import { Box, useTheme } from '@mui/material';
+import { CreateChannelDialog } from '../../../dialogs/CreateChannelDialog';
 
 export interface IChannelsComponentProps {
   selectedChatTuple : {chat: Chat | undefined, role: string}
@@ -22,12 +22,12 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
 
   React.useEffect(() => {
     setChannels([])
-    // navigate("")
     if(props.selectedChatTuple.chat !== undefined)
       getChannels(props.selectedChatTuple.chat.id)
   }, [props.selectedChatTuple])
 
   const handleChannelSelect = (channel: Channel) => {
+    console.log(channel)
     navigate(`channel/${channel.id}`)    
   }
 

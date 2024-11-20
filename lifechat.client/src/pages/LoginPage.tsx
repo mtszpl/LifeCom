@@ -4,8 +4,6 @@ import * as React from 'react';
 import { useState } from 'react';
 import { tokens } from '../Theme';
 import HttpClient from '../API/HttpClient';
-import { useDispatch, useSelector } from 'react-redux';
-import { setLoggedIn, setToken, setUsername } from '../store/slices/UserSlice';
 import { useNavigate } from 'react-router-dom';
 import Interceptors from '../API/Interceptors';
 import LoginUtils from '../utility/LoginUtils';

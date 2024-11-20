@@ -32,12 +32,10 @@ function MainPage() {
         }
         else if(token && !isLogged) {
             dispatch(setToken(token))
-            console.log(token);
             Interceptors.addAuthInterceptor("token")
             const subscription = HttpClient.get("https://localhost:7078/api/Users")
                 .subscribe({
                     next(response) {
-                        console.log(response);
                         dispatch(setUser(response))
                         dispatch(setToken(token))
                         dispatch(setLoggedIn(true))

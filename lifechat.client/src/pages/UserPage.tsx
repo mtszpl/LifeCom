@@ -10,7 +10,6 @@ import { ProfilePicture } from '../components/ProfilePicture';
 import { setProfilePicture } from '../store/slices/ProfilePictureSlice';
 import { setUsername, setEmail } from '../store/slices/UserSlice';
 import { first } from 'rxjs';
-import { setUser } from '../store/slices/UserSlice';
 
 export interface IUserPageProps {
 }

@@ -47,7 +47,7 @@ namespace LifeCom.Server.Users
         }
 
         [HttpGet("byName")]
-        public ActionResult<List<UserResponse>> GetByName([FromBody] string namePart)
+        public ActionResult<List<UserResponse>> GetByName(string namePart)
         {
             if(namePart == null)
                 return NotFound();

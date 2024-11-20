@@ -1,6 +1,6 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, TextField, Checkbox } from '@mui/material';
 import * as React from 'react';
-import Chat from '../../../../model/Chat';
+import Chat from '../../model/Chat';
 
 
 export interface ICreateChannelDialogProps {
@@ -55,6 +55,10 @@ export function CreateChannelDialog (props: ICreateChannelDialogProps) {
                 fullWidth
                 variant='filled'
                 />
+            <FormControlLabel
+                control={<Checkbox value="isPublic" onChange={() => {}} />}
+                label="Is public?"
+            />
         </DialogContent>
         <DialogActions>
             <Button variant='contained' onClick={handleClose}>Cancel</Button>
