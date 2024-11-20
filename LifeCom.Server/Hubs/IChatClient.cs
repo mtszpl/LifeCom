@@ -6,6 +6,7 @@ namespace LifeCom.Server.Hubs
     {
         Task ReceiveMessage(UserResponse author, string content);
         Task ReceiveMessage(string content);
+        Task AddedToChannel(string channelName);
         Task CreateChannel();
     }
 }

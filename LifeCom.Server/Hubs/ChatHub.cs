@@ -62,5 +62,13 @@ namespace LifeCom.Server.Hubs
         {
             await Clients.All.ReceiveMessage(new UserResponse(author), message);
         }
+
+        public async Task AddUserToChannel(Channel channel)
+        {
+            await Clients.All.ReceiveMessage(channel.name);
+        }
+
+        public async Task AddUserToChat()
+        { }
     }
 }

@@ -11,6 +11,7 @@ using LifeCom.Server.Users;
 using Microsoft.AspNetCore.Authorization;
 using static LifeCom.Server.Chats.UserChat;
 using LifeCom.Server.Models;
+using LifeCom.Server.Chats.Channels;
 
 namespace LifeCom.Server.Chats
 {
@@ -19,10 +20,14 @@ namespace LifeCom.Server.Chats
     public class ChatsController : Controller
     {
         private readonly LifeComContext _context;
+        private readonly ChannelService _channelService;
+        private readonly ChatService _chatService;
 
         public ChatsController(LifeComContext context)
         {
             _context = context;
+            _channelService = new ChannelService(context);
+            _chatService = new ChatService(context);
         }
 
         [HttpGet]
@@ -90,6 +95,19 @@ namespace LifeCom.Server.Chats
                 return NotFound("User or chat not found");
             changedUser.role = role;
             _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost("members")]
+        [Authorize(Policy = "ChatAdmin")]
+        public ActionResult<bool> AddMember([FromBody] int channelId, int userId)
+        {
+            User? user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user == null)
+                return BadRequest("User not found");
+            _channelService.AddUserToChannel(channelId, user);
+
+
             return Ok();
         }
     }

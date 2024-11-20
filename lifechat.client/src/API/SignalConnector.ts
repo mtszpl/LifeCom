@@ -39,4 +39,10 @@ export class SignalConnector {
             })
         }
     }
+
+    onAddedToChat() {
+        this.connection?.on("AddedToChannel", (channelName) => {
+            console.log(`added to channel ${channelName}`)
+        })
+    }
 }

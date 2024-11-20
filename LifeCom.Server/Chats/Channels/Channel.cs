@@ -13,6 +13,7 @@ namespace LifeCom.Server.Chats.Channels
         public List<User> members { get; set; } = [];
         public int chatId { get; set; }
         public Chat chat { get; set; } = null!;
+        public bool isPublic { get; set; } = true;
 
     }
 }
