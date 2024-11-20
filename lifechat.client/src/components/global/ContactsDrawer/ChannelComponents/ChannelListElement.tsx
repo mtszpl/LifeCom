@@ -1,8 +1,9 @@
-import { Box, IconButton, Typography } from '@mui/material';
-import * as React from 'react';
+import { Box, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import Channel from '../../../../model/Channel';
-import { Remove, Settings } from '@mui/icons-material';
 import { useTheme } from '@emotion/react';
+import React from 'react';
+import { Settings } from '@mui/icons-material';
+import { ChannelManagerDialog, EMode } from '../../../dialogs/ChannelManagerDialog';
 
 export interface IChannelListElementProps {
     key: number
@@ -14,8 +15,38 @@ export interface IChannelListElementProps {
 export function ChannelListElement (props: IChannelListElementProps) {
     const theme = useTheme()
 
-    const handleMinusClick = (e: MouseEvent) => {
+    const [isMenuOpen, setMenuOpen] = React.useState<boolean>(false)
+    const [isManagerOpen, setManagerOpen] = React.useState<boolean>(false)
+    const [editChannelMode, setEditChannelMode] = React.useState<EMode | undefined>(undefined)
+    const [anchorEl, setAnchorEl] = React.useState<EventTarget | null>(null)
+
+    const handleMenuOpen = (e: MouseEvent) => {
       e.stopPropagation()
+      setAnchorEl(e.currentTarget)
+      setMenuOpen(true)
+    }
+    
+    const handleClose = () => {
+      setMenuOpen(false)
+      setAnchorEl(null)
+    }
+
+    const handleAddUser = () => {
+      enableManager(EMode.add)
+    }
+    const handleRemoveUser = () => {
+      enableManager(EMode.remove)
+      
+    }
+    const handleChangeUserRole = () => {
+      enableManager(EMode.changeRole)
+
+    }
+
+    const enableManager = (mode: EMode)  => {
+      setMenuOpen(false)
+      setManagerOpen(true)
+      setEditChannelMode(mode)
     }
 
   return (
@@ -23,6 +54,8 @@ export function ChannelListElement (props: IChannelListElementProps) {
           sx={{
             borderBottom: "solid",
             justifyContent: "space-between",
+            cursor: "pointer",
+            alignItems: "center",
             transition: "background-color 0.2s ease-out",
             ':hover': {
               bgcolor: theme.palette.background.dark,
@@ -47,13 +80,19 @@ export function ChannelListElement (props: IChannelListElementProps) {
                     fontColor: theme.palette.background.dark,
                   }
                 }}
-                onClick={(e) => handleMinusClick(e)}
+                onClick={(e) => handleMenuOpen(e)}
               >
-                <Settings/> 
+                <Settings/>
               </IconButton>
               :
               null
             }
+            <Menu open={isMenuOpen} anchorEl={anchorEl} onClose={handleClose}>
+              <MenuItem onClick={handleAddUser}>Add User</MenuItem>
+              <MenuItem onClick={handleRemoveUser}>Remove User</MenuItem>
+              <MenuItem onClick={handleChangeUserRole}>Set Roles</MenuItem>
+            </Menu> 
+            <ChannelManagerDialog isOpen={isManagerOpen} mode={editChannelMode} channel={props.channel} onClose={() => setManagerOpen(false)}/>
     </Box>
   );
 }
