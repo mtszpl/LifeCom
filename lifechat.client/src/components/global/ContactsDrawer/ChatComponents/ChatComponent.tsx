@@ -2,7 +2,7 @@ import * as React from 'react';
 import { ChatSelector } from './ChatSelector';
 import { CreateChatDialog } from './CreateChatDialog';
 import Chat from '../../../../model/Chat';
-import { SelectChangeEvent } from '@mui/material';
+import { Box, SelectChangeEvent } from '@mui/material';
 import { useSelector } from 'react-redux';
 import HttpClient from '../../../../API/HttpClient';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ export function ChatComponent (props: IChatComponentProps) {
     const [chats, setChats] = React.useState<{chat: Chat, role: string}[]>([])
     const [selectedChatTuple, selectChat] = React.useState<{chat: Chat | undefined, role: string}>(noChatTuple)
     const [chatCreatorOpen, setChatCreatorOpen] = React.useState<boolean>(false)
+    const navigate = useNavigate()
 
     const isLoggedIn: boolean = useSelector(state => state.userData.loggedIn)
 
@@ -53,7 +54,10 @@ export function ChatComponent (props: IChatComponentProps) {
         if(e.target.value.chat === undefined){
           if(e.target.value.role === "Add")
             setChatCreatorOpen(true)      
-          selectChat(e.target.value)
+          else{
+            selectChat(noChatTuple)
+            navigate("/main")
+          }
           return
         }
         selectChat(e.target.value)
@@ -74,9 +78,9 @@ export function ChatComponent (props: IChatComponentProps) {
     }, [selectedChatTuple])
 
   return (
-    <div>
+    <Box>
         <ChatSelector chatTuples={chats} selectedChat={selectedChatTuple} handleChatSelect={handleChatSelect}/>
         <CreateChatDialog open={chatCreatorOpen} handleCancel={() => {console.log("closing"); setChatCreatorOpen(false)}} handleReturn={createChat}/>
-    </div>
+    </Box>
   );
 }

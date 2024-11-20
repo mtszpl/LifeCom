@@ -32,7 +32,10 @@ export function ContactsDrawer (props: IDrawerProps) {
 
   //Getting channels on chat change
   const changeChat = (chatTuple: {chat: Chat | undefined, role: string}) => {    
-    setSelectedChatTuple(chatTuple)    
+    if(chatTuple.chat != undefined)
+      setSelectedChatTuple(chatTuple)
+    else
+      setSelectedChatTuple(noChatTuple)
   }
 
   const toggleOpen = () => {
