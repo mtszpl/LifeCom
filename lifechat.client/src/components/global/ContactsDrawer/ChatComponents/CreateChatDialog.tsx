@@ -9,7 +9,7 @@ export interface ICreateChatDialogProps {
 }
 
 export function CreateChatDialog (props: ICreateChatDialogProps) {
-    const chatsUrl: string = "https://localhost:7078/api/Chats/create"
+    const chatsUrl: string = `${HttpClient.baseApiUrl}/Chats/create`
 
     function submit (event: React.FormEvent<HTMLFormElement>){
         event.preventDefault()

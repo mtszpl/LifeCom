@@ -1,5 +1,4 @@
 import { Box, Typography, useTheme } from '@mui/material';
-import * as React from 'react';
 import Message from '../model/Message';
 import { useSelector } from 'react-redux';
 
@@ -26,7 +25,7 @@ export function MessageBox (props: IMessageBoxProps) {
       // minHeight="60px"
       >
       <Typography
-        color={theme.palette.primary.light} marginBottom="1vh" alignSelf={stateUser.username === props.message.author.username ? "flex-end" : "flex-start"}>
+        color={theme.palette.primary.light} marginBottom="1vh" alignSelf={stateUser?.username === props.message.author.username ? "flex-end" : "flex-start"}>
         {props.message.author.username}
       </Typography>
       <Typography align='justify'>

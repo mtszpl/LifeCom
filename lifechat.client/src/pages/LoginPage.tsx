@@ -31,7 +31,7 @@ export function LoginPage () {
       setRememberMe(!rememberMe)
     }
 
-    const loginUrl: string = `https://localhost:7078/api/Auth/login`
+    const loginUrl: string = `${HttpClient.baseApiUrl}/Auth/login`
     const reroute = useNavigate()
     
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>{

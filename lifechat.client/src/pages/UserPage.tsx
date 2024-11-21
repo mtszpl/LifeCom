@@ -23,8 +23,8 @@ export function UserPage (props: IUserPageProps) {
 
     const dispatch = useDispatch()
 
-    const userUrl: string = "https://localhost:7078/api/Users"
-    const imagesUrl: string = "https://localhost:7078/api/Images"
+    const userUrl: string = `${HttpClient.baseApiUrl}/Users`
+    const imagesUrl: string = `${HttpClient.baseApiUrl}/Images`
 
     const changeProfilePic = (newProfilePic: File | undefined) => {
         if(newProfilePic === undefined) {

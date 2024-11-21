@@ -2,13 +2,12 @@ import { Box, Theme, useTheme } from "@mui/material";
 import { useDispatch, useSelector,  } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { setConnector } from "../store/slices/ConnectorSlice";
-import { SignalConnector }  from "../API/SignalConnector";
 import { Topbar } from "../components/global/Tobpar";
 import { ContactsDrawer } from "../components/global/ContactsDrawer/ContactsDrawer";
 import Interceptors from "../API/Interceptors";
 import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
 import HttpClient from "../API/HttpClient";
+import { SignalConnector } from "../API/SignalConnector";
 
 function MainPage() {
 
@@ -20,8 +19,6 @@ function MainPage() {
     
     useEffect(() => {
         const remember = localStorage.getItem("remember")
-        const signalConnector = new SignalConnector()
-        dispatch(setConnector(signalConnector))
         
         const token = localStorage.getItem("token")
         if((remember === null || remember === undefined) && !isLogged) {
@@ -33,7 +30,7 @@ function MainPage() {
         else if(token && !isLogged) {
             dispatch(setToken(token))
             Interceptors.addAuthInterceptor("token")
-            const subscription = HttpClient.get("https://localhost:7078/api/Users")
+            const subscription = HttpClient.get(`${HttpClient.baseApiUrl}/Users`)
                 .subscribe({
                     next(response) {
                         dispatch(setUser(response))
@@ -47,6 +44,7 @@ function MainPage() {
                     complete() {
                         subscription.unsubscribe()
                         dispatch(setLoggedIn(true))
+                        SignalConnector.buildConnection()
                     }
                 })
         }

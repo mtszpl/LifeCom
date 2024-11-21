@@ -1,7 +1,8 @@
-import { Autocomplete, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import { Autocomplete, Button, Dialog, DialogContent, DialogTitle, TextField } from '@mui/material';
 import * as React from 'react';
 import Channel from '../../model/Channel';
 import HttpClient from '../../API/HttpClient';
+import { useSelector } from 'react-redux';
 
 export interface IChannelManagerDialogProps {
   isOpen: boolean,
@@ -17,16 +18,13 @@ export enum EMode {
 }
 
 export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
-  const url: string = "https://localhost:7078/api/users/byName"
-
-
   const [matchingUsers, setMatchingUsers] = React.useState<[]>([])
   const [selectedUser, setSelectedUser] = React.useState(undefined)
 
   const searchUser = (e) => {
     const userName = e.target.value
     if(userName.length >= 3){
-      HttpClient.get(`${url}?namePart=${userName}`).subscribe({
+      HttpClient.get(`${HttpClient.baseApiUrl}/users/byName?namePart=${userName}`).subscribe({
         next: (data) => {
           const usersList = [...data]
           setMatchingUsers(usersList)
@@ -35,6 +33,17 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
     }
     else
       setMatchingUsers([])
+  }
+
+  const submit = () => {
+    addUser()
+  }
+
+  const addUser = () => {
+    if(!selectedUser)
+      return
+    console.log(selectedUser)
+    HttpClient.post(`${HttpClient.baseApiUrl}/Channels/user`, selectedUser.username)
   }
 
   const titleDescription = () => {
@@ -69,6 +78,11 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
           onInputChange={e => searchUser(e)}
           renderInput={(params) => <TextField {...params} label="Username" />}
           />
+        <Button variant='contained'
+          onClick={() => submit()}
+        >
+          Confirm
+        </Button>
       </DialogContent>
     </Dialog>
   );

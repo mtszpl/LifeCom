@@ -9,6 +9,9 @@ export default class HttpClient {
 
     private static API = axios.create({baseURL: ""})
 
+    public static baseApiUrl: string = "https://localhost:7078/api"
+    public static serverUrl: string = "https://localhost:7078"
+
     static listInterceptors() {
         console.log(HttpClient.API.interceptors.request);
         console.log(HttpClient.API.interceptors.response);

@@ -17,8 +17,6 @@ export function ChatComponent (props: IChatComponentProps) {
         chat: undefined,
         role: "None"
     }
-    const apiUrl: string = "https://localhost:7078/api/"
-
     const [chats, setChats] = React.useState<{chat: Chat, role: string}[]>([])
     const [selectedChatTuple, selectChat] = React.useState<{chat: Chat | undefined, role: string}>(noChatTuple)
     const [chatCreatorOpen, setChatCreatorOpen] = React.useState<boolean>(false)
@@ -37,7 +35,7 @@ export function ChatComponent (props: IChatComponentProps) {
     * Loads chats of logged user
     */
     const getChats = () => {
-        const chatSubscription = HttpClient.get(`${apiUrl}Chats`)
+        const chatSubscription = HttpClient.get(`${HttpClient.baseApiUrl}/Chats`)
         .subscribe(({
             next(response) {
               setChats([...response]);

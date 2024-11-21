@@ -14,7 +14,7 @@ export function RegisterPage () {
     const [email, setEmail] = useState<string>("")
     const [emailError, setEmailError] = useState<boolean>(false)
 
-    const registerUrl: string = `https://localhost:7078/api/Auth/register`
+    const registerUrl: string = `${HttpClient.baseApiUrl}/Auth/register`
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
         setEmail(e.target.value)

@@ -72,7 +72,7 @@ export default class Inteceptors {
                 
                 try{
                     
-                    const refreshResponse = await axios.get("https://localhost:7078/api/Auth/refresh", {
+                    const refreshResponse = await axios.get(`${HttpClient.baseApiUrl}/Auth/refresh`, {
                         headers: {
                             "Authorization": `Bearer ${token}`
                         },

@@ -21,7 +21,7 @@ export function ProfilePicture (props: IProfilePictureProps) {
 
     const[pp, setPp] = React.useState<string | undefined>(undefined)
 
-    const url: string = "https://localhost:7078/api/Images"
+    const url: string = `${HttpClient.baseApiUrl}/Images`
 
     React.useEffect(() => {
         HttpClient.get(url)
