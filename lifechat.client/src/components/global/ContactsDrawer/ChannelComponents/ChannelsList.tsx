@@ -4,14 +4,14 @@ import Channel from '../../../../model/Channel';
 import { Add } from '@mui/icons-material';
 import { ChannelListElement } from './ChannelListElement';
 
-export interface IChannelsSelectionProps {
+export interface IChannelsListProps {
     channels: Channel[]
     role: string
     handleChannelSelect: (c: Channel) => void
     startCreatingChannel: () => void
 }
 
-export function ChannelsSelection (props: IChannelsSelectionProps) {
+export function ChannelsList (props: IChannelsListProps) {
     const theme = useTheme()
 
   return (
