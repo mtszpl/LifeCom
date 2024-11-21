@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Channel from '../../../../model/Channel';
-import { ChannelsSelection } from './ChannelsSelection';
+import { ChannelsList } from './ChannelsList';
 import { useNavigate } from 'react-router-dom';
 import Chat from '../../../../model/Chat';
 import HttpClient from '../../../../API/HttpClient';
@@ -12,8 +12,6 @@ export interface IChannelsComponentProps {
 }
 
 export function ChannelsComponent (props: IChannelsComponentProps) {
-  const apiUrl: string = "https://localhost:7078/api/"
-
   const theme = useTheme()
   const navigate = useNavigate()
 
@@ -40,12 +38,9 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   * @param chatId Id of selected chat
   */
   const getChannels = (chatId: number) => {
-    console.log(chatId);
-    const channelsSubscription = HttpClient.get(`${apiUrl}Channels/bychat?chatId=${chatId}`)
+    const channelsSubscription = HttpClient.get(`${HttpClient.baseApiUrl}/Channels/bychat?chatId=${chatId}`)
     .subscribe({
       next(response) {
-        console.log("channels")
-        console.log(response)
         if(response !== undefined)
           setChannels(response)
       },
@@ -64,7 +59,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
       chatId: chatId,
       name: name
     }
-    const subscription = HttpClient.post(`${apiUrl}Channels/create?atChat=${chatId}`, payload)
+    const subscription = HttpClient.post(`${HttpClient.baseApiUrl}/Channels/create?atChat=${chatId}`, payload)
     .subscribe({
         next() {},
         error(err: Error) {console.error(err.message)},
@@ -80,7 +75,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   return (
     <Box height="100%" bgcolor={theme.palette.background.default}>
       <CreateChannelDialog open={channelCreatorOpen} handleCancel={() => {setChannelCreatorOpen(false)}} chatTuple={props.selectedChatTuple} handleReturn={createChannel}/>
-      <ChannelsSelection channels={channels} role={props.selectedChatTuple.role} handleChannelSelect={handleChannelSelect} startCreatingChannel={startCreatingChannel}/>      
+      <ChannelsList channels={channels} role={props.selectedChatTuple.role} handleChannelSelect={handleChannelSelect} startCreatingChannel={startCreatingChannel}/>      
     </Box>
   );
 }

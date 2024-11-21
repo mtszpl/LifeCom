@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import Message from '../model/Message';
 import HttpClient from '../API/HttpClient';
 import { MessageBox } from './MessageBox';
-import { useSelector } from 'react-redux';
 import { SignalConnector } from '../API/SignalConnector';
 import { useParams } from 'react-router-dom';
 import { SendSharp } from '@mui/icons-material';
@@ -13,21 +12,17 @@ export function MessageChannel () {
 
     const theme: Theme = useTheme()
     const [messages, setMessages] = useState<Message[]>([])
-    const connector: SignalConnector = useSelector(state => state.connectorContainer.connector)
-
     const [content, setContent] = useState<string>("")
 
-    const messageUrl: string = "https://localhost:7078/api/Messages"
+    const messageUrl: string = `${HttpClient.baseApiUrl}/Messages`
 
     useEffect(() => {
         getMessages()
     }, [id])
 
     useEffect(() => {
-        if(connector !== undefined)
-            connector.onReceiveMessage(getMessages)
-        
-    }, [connector])    
+        SignalConnector.onReceiveMessage(getMessages)
+    }, [])    
 
     const getMessages = () => {
         HttpClient.get(`${messageUrl}?id=${id}`)

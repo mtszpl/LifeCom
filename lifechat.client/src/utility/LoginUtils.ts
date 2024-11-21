@@ -1,4 +1,5 @@
 import Interceptors from "../API/Interceptors";
+import { SignalConnector } from "../API/SignalConnector";
 import store from "../store/store";
 
 export default class Login {
@@ -15,11 +16,11 @@ export default class Login {
             console.log(`user set to: ${store.getState().userData.user}`)
         }
         if(response.token !== undefined){
-            console.log(`setting token to: ${response.token}`);
             store.dispatch({ type: 'user/setToken', payload: response.token})
             localStorage.setItem("token", response.token)
             // store.dispatch({type: "connector/retryConnection", payload: response.token})
         }
+        SignalConnector.buildConnection()
     }
     
     static setToken = (token) => {        

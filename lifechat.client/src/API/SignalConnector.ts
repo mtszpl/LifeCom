@@ -1,15 +1,17 @@
 import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import HttpClient from './HttpClient';
 
 export class SignalConnector {
 
-    connection: HubConnection | undefined = undefined
+    private static connection: HubConnection | undefined = undefined
 
-    constructor() {
+    static buildConnection() {
         const token = localStorage.getItem("token")
         if(token === null)
             return
-        this.connection = new HubConnectionBuilder()
-        .withUrl("https://localhost:7078/hub", {
+        console.log("connecting")
+        SignalConnector.connection = new HubConnectionBuilder()
+        .withUrl(`${HttpClient.serverUrl}/hub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets,
             accessTokenFactory: () => {
@@ -20,10 +22,10 @@ export class SignalConnector {
         .build()
 
 
-        this.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(`fug, ${e}`))
+        SignalConnector.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(`fug, ${e}`))
 
-        if(this.connection !== undefined) {
-            this.connection.onreconnecting((e) => {
+        if(SignalConnector.connection !== undefined) {
+            SignalConnector.connection.onreconnecting((e) => {
                 console.error(e?.message)
                 alert("Lost connection to server, the site will now refresh")
                 location.reload()
@@ -32,16 +34,23 @@ export class SignalConnector {
 
     }
 
-    onReceiveMessage(callback: () => void) {
-        if(this.connection) {
-            this.connection.on("ReceiveMessage", (author, content) => {
+    static onReceiveMessage(callback: () => void) {
+        console.log("on message")
+        if(SignalConnector.connection) {
+            SignalConnector.connection.on("ReceiveMessage", (author, content) => {
                 callback()
             })
         }
     }
 
-    onAddedToChat() {
-        this.connection?.on("AddedToChannel", (channelName) => {
+    static addToChat(){
+        if(SignalConnector.connection) {
+            SignalConnector.connection.send("AddUserToChat")
+        }
+    }
+    
+    static onAddedToChat() {
+        SignalConnector.connection?.on("AddedToChannel", (channelName) => {
             console.log(`added to channel ${channelName}`)
         })
     }
