@@ -19,15 +19,17 @@ namespace LifeCom.Server.Chats
     [Authorize]
     public class ChatsController : Controller
     {
+        private readonly IAuthorizationService _authorizationService;
         private readonly LifeComContext _context;
         private readonly ChannelService _channelService;
         private readonly ChatService _chatService;
 
-        public ChatsController(LifeComContext context)
+        public ChatsController(LifeComContext context, IAuthorizationService authorizationService)
         {
             _context = context;
             _channelService = new ChannelService(context);
             _chatService = new ChatService(context);
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -72,43 +74,68 @@ namespace LifeCom.Server.Chats
             return Ok(true);
         }
 
-        [HttpPut]
-        [Authorize(Policy = "ChatAdmin")]
-        public ActionResult ChangeName([FromBody] int chatId, string name) 
+        [HttpPut("rename/{chatId}")]
+        public async Task<ActionResult> ChangeName(int chatId, [FromBody]string name) 
         {
+            if (name == "")
+                return BadRequest("No name");
             Chat? chat = _context.Chat.FirstOrDefault(c => c.Id == chatId);
             if(chat == null)
                 return NotFound("Chat not found");
-            chat.name = name;
-            _context.SaveChanges();
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, chat.Id, "ChatAdmin");
+            if(authorizationResult.Succeeded)
+            {           
+                chat.name = name;
+                _context.SaveChanges();
+            }
+            else if (User.Identity.IsAuthenticated)            
+                return new ForbidResult();            
+            else            
+                return new ChallengeResult();
+            
 
             return Ok();
         }
 
-        [HttpPut("roles")]
-        [Authorize(Policy = "ChatAdmin")]
+        [HttpPut("{chatId}/roles/{changedUserId}")]
 
-        public ActionResult<bool> ChangePermissions([FromBody] int changedUserId, string role)
+        public async Task<ActionResult<bool>> ChangePermissionsAsync(int chatId, int changedUserId, string role)
         {
             UserChat? changedUser = _context.UserChats.FirstOrDefault(uc => uc.userId == changedUserId);
             if (changedUser == null)
                 return NotFound("User or chat not found");
-            changedUser.role = role;
-            _context.SaveChanges();
-            return Ok();
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, chatId, "ChatAdmin");
+            if(authorizationResult.Succeeded)
+            {
+                changedUser.role = role;
+                _context.SaveChanges();
+                return Ok();
+            }
+            else if (User.Identity.IsAuthenticated)
+                return new ForbidResult();
+            else
+                return new ChallengeResult();
         }
 
-        [HttpPost("members")]
-        [Authorize(Policy = "ChatAdmin")]
-        public ActionResult<bool> AddMember([FromBody] int channelId, int userId)
+        [HttpPost("{chatId}/{channelId}/members")]
+        public async Task<ActionResult<bool>> AddMemberAsync(int chatId, int channelId, [FromBody]int userId)
         {
             User? user = _context.Users.FirstOrDefault(u => u.Id == userId);
             if (user == null)
                 return BadRequest("User not found");
-            _channelService.AddUserToChannel(channelId, user);
-
-
-            return Ok();
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, chatId, "ChatAdmin");
+            if (authorizationResult.Succeeded)
+            {
+                _channelService.AddUserToChannel(channelId, user);
+                return Ok();
+            }
+            else if (User.Identity.IsAuthenticated)
+                return new ForbidResult();
+            else
+                return new ChallengeResult();
         }
     }
 }
