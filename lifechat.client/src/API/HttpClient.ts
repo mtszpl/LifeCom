@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import { from } from "rxjs"
+import { SignalConnector } from "./SignalConnector"
 
 /**
  * Class used for executing API calls and returning data as RxJs observable
@@ -13,6 +14,7 @@ export default class HttpClient {
     public static serverUrl: string = "https://localhost:7078"
 
     static listInterceptors() {
+        console.log(SignalConnector)
         console.log(HttpClient.API.interceptors.request);
         console.log(HttpClient.API.interceptors.response);
     }
@@ -58,17 +60,8 @@ export default class HttpClient {
        HttpClient.API.interceptors.response.eject(interceptor)
     }
 
-    static request (request: Promise<any>) {
-        return from(request)
-    }
-
-    /**
-     * Executes 'get' request
-     * @param url Endpoint url
-     * @param params Request parameters, default withCredentials with content-type "application/json"
-     * @returns Observable with data from call or error message if occured
-     */
-    static get = (url: string, params: any = undefined) => {    
+    
+    private static processParams =(params: any) => {
         if(params === undefined)
             params = {
                 withCredentials: true,
@@ -76,9 +69,12 @@ export default class HttpClient {
                     "Content-Type": "application/json"
                 }
             }
-        else 
+            else 
             params.withCredentials = true 
-        const axiosPromise = HttpClient.API.get(url, params)
+        return params
+    }
+
+    private static executeRequest = (axiosPromise: Promise<AxiosResponse<any, any>>) => {
         return from(axiosPromise.then(response => {
             return response.data
         }).catch(error => {
@@ -88,6 +84,37 @@ export default class HttpClient {
                 throw new Error(error.message)
             }
         }))
+    }
+
+    private static request = (method: "get" | "post" | "put" | "delete", url: string, params?: any, payload?: any) => {
+        params = HttpClient.processParams(params);
+        let axiosPromise
+        switch(method){
+            case "get":
+                axiosPromise = HttpClient.API.get(url, params)
+                break;
+            case "post":
+                axiosPromise = HttpClient.API.post(url, payload, params)
+                break;
+            case "put":
+                axiosPromise = HttpClient.API.put(url, payload, params)
+                break;
+            case "delete":
+                axiosPromise = HttpClient.API.delete(url, payload)
+                break;
+        }
+        // axios({method: method, url: url, data: payload, headers: params.headers})
+        return HttpClient.executeRequest(axiosPromise)
+    }
+    
+    /**
+     * Executes 'get' request
+     * @param url Endpoint url
+     * @param params Request parameters, default withCredentials with content-type "application/json"
+     * @returns Observable with data from call or error message if occured
+     */
+    static get = (url: string, params: any = undefined) => {    
+        return HttpClient.request('get', url, params)
     }
 
     /**
@@ -98,25 +125,7 @@ export default class HttpClient {
      * @returns Observable with data from call or error message if occured
      */
     static post = (url: string, payload: unknown, params: any = undefined) => {
-        if(params === undefined)
-            params = {
-                withCredentials: true,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        else 
-            params.withCredentials = true
-        const axiosPromise = HttpClient.API.post(url, payload, params)
-        return from(axiosPromise.then(response => {
-            return response.data;
-        }).catch(error => {
-            if (error.response) {
-                throw new Error(error.response.data || error.response.statusText)
-            } else {
-                throw new Error(error.message)
-            }
-        }))
+        return HttpClient.request('post', url, params, payload)
     }
 
     /**
@@ -127,26 +136,11 @@ export default class HttpClient {
      * @returns Observable with data from call or error message if occured
      */
     static put = (url: string, payload: any, params: any = undefined) => {
-        if(params === undefined)
-            params = {
-                withCredentials: true,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
-        else 
-            params.withCredentials = true
-        const axiosPromise = HttpClient.API.put(url, payload, params)
-        return from(axiosPromise.then(response => {
-            return response.data
-        }))
+        return HttpClient.request('put', url, params, payload)
     }
     
     static delete = (url: string, payload: any =  undefined) => {
-        const axiosPromise = HttpClient.API.delete(url, payload)
-        return from(axiosPromise.then(response => {
-            return response
-        }))
+        return HttpClient.request('delete', url, undefined, payload);
     }
 
 
