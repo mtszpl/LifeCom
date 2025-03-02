@@ -2,7 +2,7 @@
 using LifeCom.Server.Users;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LifeCom.Server.Chats.Messages
+namespace LifeCom.Server.Messages
 {
     public class Message
     {

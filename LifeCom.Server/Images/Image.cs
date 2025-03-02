@@ -1,4 +1,6 @@
-﻿namespace LifeCom.Server.Users.Images
+﻿using LifeCom.Server.Users;
+
+namespace LifeCom.Server.Images
 {
     public class Image
     {

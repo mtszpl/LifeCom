@@ -14,7 +14,7 @@ using LifeCom.Server.Chats.Channels;
 using Microsoft.AspNetCore.SignalR;
 using LifeCom.Server.Models;
 
-namespace LifeCom.Server.Chats.Messages
+namespace LifeCom.Server.Messages
 {
     [Route("api/[controller]")]
     [Authorize]
@@ -72,11 +72,11 @@ namespace LifeCom.Server.Chats.Messages
         }
 
         [HttpPost]
-        public async Task<ActionResult<Message>> SendMessage([FromBody]MessageRequest messageRequest)
+        public async Task<ActionResult<Message>> SendMessage([FromBody] MessageRequest messageRequest)
         {
-            if (messageRequest.content == string.Empty || messageRequest.channelId == null)            
+            if (messageRequest.content == string.Empty || messageRequest.channelId == null)
                 return BadRequest("Content missing");
-            
+
             int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
             if (id == null)
                 return NotFound("User not found");

@@ -9,6 +9,7 @@ using System.Text;
 using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Auth.Authorization;
+using Microsoft.AspNetCore.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 //SignalIR for Websocket
+builder.Services.AddSingleton<IUserIdProvider, LiveComIdProvider>();
 builder.Services.AddSignalR();
 
 
@@ -87,10 +89,11 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAuthorization(options => {
     options.AddPolicy("ChatAdmin", policy =>
-        policy.Requirements.Add(new HasChatRole()));
+        policy.Requirements.Add(new HasChatAdminRole()));
 });
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<IAuthorizationHandler, ChatRoleHandler>();
 
 var app = builder.Build();
 
@@ -116,6 +119,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseWebSockets();
 
 //app.MapIdentityApi<User>();
 

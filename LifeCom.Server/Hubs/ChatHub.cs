@@ -3,6 +3,7 @@ using LifeCom.Server.Data;
 using LifeCom.Server.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -32,10 +33,9 @@ namespace LifeCom.Server.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            base.OnConnectedAsync();
-            ClaimsIdentity identity = Context.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                return;
+            await base.OnConnectedAsync();
+            ClaimsIdentity? identity = Context.User.Identity as ClaimsIdentity;
+            if (identity == null) return;
             int? id = int.Parse(identity.FindFirst("id").Value);
 
             User user = _context.Users.Include(u => u.channels).SingleOrDefault(u => u.Id == id);
@@ -46,15 +46,11 @@ namespace LifeCom.Server.Hubs
             }
             foreach(Channel channel in user.channels)
                 await JoinChannel(channel.Id);
-            await Clients.All.ReceiveMessage($"{user.username} has joined");
-
-            await Clients.All.ReceiveMessage($"{Context.ConnectionId} has joined");
-            //return base.OnConnectedAsync();
+            await Groups.AddToGroupAsync(Context.ConnectionId.ToString(), user.Id.ToString());
         }
 
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            ClaimsIdentity identity = Context.User.Identity as ClaimsIdentity;
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -63,12 +59,9 @@ namespace LifeCom.Server.Hubs
             await Clients.All.ReceiveMessage(new UserResponse(author), message);
         }
 
-        public async Task AddUserToChannel(Channel channel)
+        public async Task AddUserToChannel(string userId, Channel channel)
         {
-            await Clients.All.ReceiveMessage(channel.name);
+            await Clients.User(userId).ReceiveMessage(channel.name);
         }
-
-        public async Task AddUserToChat()
-        { }
     }
 }

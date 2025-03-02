@@ -1,6 +1,6 @@
 ﻿using LifeCom.Server.Users;
 using LifeCom.Server.Chats;
-using LifeCom.Server.Chats.Messages;
+using LifeCom.Server.Messages;
 
 namespace LifeCom.Server.Chats.Channels
 {

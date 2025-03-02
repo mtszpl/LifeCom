@@ -1,12 +1,12 @@
 ﻿using LifeCom.Server.Data;
 using LifeCom.Server.Models;
-using LifeCom.Server.Users.Images;
+using LifeCom.Server.Users;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 
-namespace LifeCom.Server.Users.Pictures
+namespace LifeCom.Server.Images
 {
     [Route("api/[controller]")]
     public class ImagesController : Controller
@@ -95,9 +95,9 @@ namespace LifeCom.Server.Users.Pictures
             file.CopyTo(stream);
             byte[] imageByte = stream.ToArray();
             User? user = _userService.GetById(id);
-            if(user == null) return NotFound();
+            if (user == null) return NotFound();
             Image newImage = new Image
-            { 
+            {
                 userId = user.Id
             };
             newImage.Set(file, user);

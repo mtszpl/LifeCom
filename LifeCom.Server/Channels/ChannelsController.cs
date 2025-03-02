@@ -10,6 +10,8 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Users;
 using LifeCom.Server.Models;
+using LifeCom.Server.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LifeCom.Server.Chats.Channels
 {
@@ -19,11 +21,18 @@ namespace LifeCom.Server.Chats.Channels
     {
         private readonly ChannelService _channelService;
         private readonly ChatService _chatService;
+        private readonly UserService _userService;
+        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ChannelsController(LifeComContext context)
+
+        public ChannelsController(LifeComContext context, IAuthorizationService authorizationService, IHubContext<ChatHub, IChatClient> hubContext)
         {
             _channelService = new ChannelService(context);
             _chatService = new ChatService(context);
+            _userService = new UserService(context);
+            _authorizationService = authorizationService;
+            _hubContext = hubContext;
         }
 
         // GET: Channels
@@ -54,35 +63,48 @@ namespace LifeCom.Server.Chats.Channels
         }
 
         [HttpPost("create")]
-        [Authorize(Policy = "ChatAdmin")]
-        public ActionResult CreateChannel(int atChat, [FromBody]ChannelRequest request)
+        public async Task<ActionResult> CreateChannelAsync(int atChat, [FromBody]ChannelRequest request)
         {
             Console.WriteLine("Creting channel");
 
             Chat? owningChat = _chatService.GetById(request.chatId);
             if(owningChat == null)
                 return NotFound("Chat not found");
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, owningChat.Id, "ChatAdmin");
 
-            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (userId == null)
-                return NotFound("User not found");
-            Channel? channel = _channelService.CreteChannel(request.chatId, request.name, userId);
-            if (channel != null)
-                return Ok(channel);
+            if (authorizationResult.Succeeded)
+            {
+
+                int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
+                if (userId == null)
+                    return NotFound("User not found");
+                Channel? channel = _channelService.CreteChannel(request.chatId, request.name, userId);
+                if (channel != null)
+                    return Ok(channel);
+                else
+                    return BadRequest("Unsuccesful");
+            }
+            else if (User.Identity.IsAuthenticated)
+                return new ForbidResult();
             else
-                return BadRequest("Unsuccesful");
+                return new ChallengeResult();
         }
 
-        [HttpPost("user")]
-        [Authorize(Policy = "ChatAdmin")]
-        public void AddUser([FromBody]UserRequest user)
+        [HttpPost("{channelId}/user")]
+        public ActionResult AddUser(int channelId, [FromBody]string username)
         {
-
+            User? user = _userService.GetByNamePart(username).First();
+            Channel? channel = _channelService.GetById(channelId);
+            if (channel == null || user == null) return NotFound();
+            _hubContext.Clients.User(user.Id.ToString()).AddedToChannel("some fokken channel");
+            _hubContext.Clients.User(user.Id.ToString()).ReceiveDebugMessage("now this shit is working, for some fucking reason");
+            return Ok();
         }
 
-        [HttpDelete("user")]
+        [HttpDelete("{channelId}/user")]
         [Authorize(Policy = "ChatAdmin")]
-        public void DeleteUser([FromBody]UserRequest user) 
+        public void DeleteUser(int channelId, [FromBody]UserRequest user) 
         {
 
         }
