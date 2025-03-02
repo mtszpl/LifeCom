@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
+import User from "../../model/User"
 
-const initialState = {
+const initialState: {
+    user: User | undefined,
+    loggedIn: boolean,
+    token: string | undefined
+} = {
     user: undefined,
     loggedIn: false,
     token: undefined
@@ -25,7 +30,8 @@ export const userSlice = createSlice({
                 state.user.username = action.payload
         },
         setEmail: (state, action) => {
-            state.user.email = action.payload
+            if(state.user)
+                state.user.email = action.payload
         }
     }
 })

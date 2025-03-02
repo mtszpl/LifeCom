@@ -17,6 +17,7 @@ namespace LifeCom.Server.Authorization
     {
         private readonly LifeComContext _context;
         private readonly IConfiguration _configuration;
+        private const string refreshCookieName = "fresh";
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
@@ -53,8 +54,8 @@ namespace LifeCom.Server.Authorization
                 refreshExpirationTime = DateTime.UtcNow.AddDays(7)
             };
 
-            Response.Cookies.Delete("fresh");
-            Response.Cookies.Append("fresh", refresh, new CookieOptions
+            Response.Cookies.Delete(refreshCookieName);
+            Response.Cookies.Append(refreshCookieName, refresh, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
@@ -78,32 +79,48 @@ namespace LifeCom.Server.Authorization
             return BadRequest("User already exists");
         }
 
+        private bool checkLoginParamsAreProvided(UserRequest request)
+        {
+            return !(request.username == string.Empty && request.email == string.Empty) || request.password != string.Empty;
+        }
+
         [HttpPost("login")]
         public ActionResult<AuthResponse> Login([FromBody]UserRequest request)
         {
-            if ((request.username == string.Empty && request.email == string.Empty) || request.password == string.Empty)
+ 
+            if (!checkLoginParamsAreProvided(request) && Request.Cookies[refreshCookieName] == null)
                 return BadRequest("No arguments");
 
             User? searchedUser = null;
-            if(request.username != string.Empty)
+            if (request.username != string.Empty)
                 searchedUser = _context.Users
                     .SingleOrDefault(user => user.username == request.username);
-            else
+            else if (request.email != string.Empty)
                 searchedUser = _context.Users
                     .SingleOrDefault(user => user.email == request.email);
+            else if (Request.Cookies[refreshCookieName] != null)
+            {
+                User? debugUser = _context.Users
+                    .SingleOrDefault(u => u.refreshToken == Request.Cookies[refreshCookieName]);
+                searchedUser = _context.Users
+                    .SingleOrDefault(u => u.refreshToken == Request.Cookies[refreshCookieName] && u.refreshExpirationTime.CompareTo(DateTime.UtcNow) >= 0);
+            }
+
             if (searchedUser == null)
                 return BadRequest("Username or password wrong");
-            if (!BCrypt.Net.BCrypt.Verify(request.password, searchedUser.passwordHash))
+            if (!BCrypt.Net.BCrypt.Verify(request.password, searchedUser.passwordHash) && Request.Cookies[refreshCookieName] == null)
                 return BadRequest("Username or password wrong");
 
-            string refresh = GenerateRefreshToken();
-            searchedUser.refreshToken = refresh;
-            searchedUser.refreshExpirationTime = DateTime.UtcNow.AddDays(7);
-            _context.SaveChanges();
+            if(searchedUser.refreshExpirationTime.CompareTo(DateTime.UtcNow) <= 0)
+            {
+                searchedUser.refreshToken = GenerateRefreshToken();
+                searchedUser.refreshExpirationTime = DateTime.UtcNow.AddDays(7);
+                _context.SaveChanges();
+            }
 
-            Response.Cookies.Delete("fresh");
+            Response.Cookies.Delete(refreshCookieName);
 
-            Response.Cookies.Append("fresh", refresh, new CookieOptions {
+            Response.Cookies.Append(refreshCookieName, searchedUser.refreshToken, new CookieOptions {
                 HttpOnly = true,
                 Secure = true,
                 Expires = searchedUser.refreshExpirationTime,
@@ -115,57 +132,17 @@ namespace LifeCom.Server.Authorization
             {
                 user = new UserResponse(searchedUser),
                 token = CreateToken(searchedUser),
-                refreshToken = refresh
+                //refreshToken = refresh
             };
 
             return Ok(response);
         }
 
-        [HttpGet("login")]
-        public ActionResult<AuthResponse> Login()
-        {
-            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                return Forbid("Unauthorized");
-            int? id = int.Parse(identity.FindFirst("id").Value);
-            if (id == null)
-                return Forbid("Unathorized");
-            User? searchedUser = searchedUser = _context.Users
-                .SingleOrDefault(user => user.Id == id);
-
-            if (searchedUser == null)
-                return BadRequest("User not found");
-
-            string refresh = GenerateRefreshToken();
-            searchedUser.refreshToken = refresh;
-            searchedUser.refreshExpirationTime = DateTime.UtcNow.AddDays(7);
-            _context.SaveChanges();
-
-            Response.Cookies.Delete("fresh");
-
-            Response.Cookies.Append("fresh", refresh, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                Expires = searchedUser.refreshExpirationTime,
-                SameSite = SameSiteMode.None,
-                IsEssential = true
-            });
-
-            AuthResponse response = new AuthResponse
-            {
-                user = new UserResponse(searchedUser),
-                token = CreateToken(searchedUser),
-                refreshToken = refresh
-            };
-
-            return Ok(response);
-        }
 
         [HttpGet("refresh")]
         public ActionResult<string> Refresh()
         {
-            string? refreshToken = Request.Cookies["fresh"];
+            string? refreshToken = Request.Cookies[refreshCookieName];
             if (refreshToken == null)
                 return BadRequest("No refresh token");
             User? user = _context.Users.SingleOrDefault(u => u.refreshToken == refreshToken);
@@ -199,7 +176,7 @@ namespace LifeCom.Server.Authorization
 
         private string GenerateRefreshToken()
         {
-            var randomNumber = new byte[32];
+            byte[] randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(randomNumber);

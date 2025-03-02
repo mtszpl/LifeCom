@@ -8,6 +8,7 @@ import Interceptors from "../API/Interceptors";
 import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
 import HttpClient from "../API/HttpClient";
 import { SignalConnector } from "../API/SignalConnector";
+import LoginUtils from "../utility/LoginUtils";
 
 function MainPage() {
 
@@ -20,33 +21,29 @@ function MainPage() {
     useEffect(() => {
         const remember = localStorage.getItem("remember")
         
-        const token = localStorage.getItem("token")
+        // const token = localStorage.getItem("token")
         if((remember === null || remember === undefined) && !isLogged) {
             localStorage.removeItem("token")
             localStorage.removeItem("remember")
             reroute("/")
             return
         }
-        else if(token && !isLogged) {
-            dispatch(setToken(token))
-            Interceptors.addAuthInterceptor("token")
-            const subscription = HttpClient.get(`${HttpClient.baseApiUrl}/Users`)
+        else if(remember && !isLogged) {
+            const subsciption = LoginUtils.login({
+                username: "",
+                password: "",
+                email: ""})
                 .subscribe({
-                    next(response) {
-                        dispatch(setUser(response))
-                        dispatch(setToken(token))
-                        dispatch(setLoggedIn(true))
-                        localStorage.setItem("token", token)
-                    },
-                    error(err) {
-                        console.error(err.message)
+                    error(err: Error) {
+                        console.error(err)
+                        reroute("/")
                     },
                     complete() {
-                        subscription.unsubscribe()
-                        dispatch(setLoggedIn(true))
-                        SignalConnector.buildConnection()
+                        subsciption.unsubscribe()
+                        Interceptors.addAuthInterceptor()
+                        // reroute("/main")
                     }
-                })
+                });
         }
     },[])
 

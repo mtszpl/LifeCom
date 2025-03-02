@@ -64,11 +64,8 @@ export function LoginPage () {
       const payload = !isEmail(loginString) ?
       {username: loginString, password: password, email: null}
       : {username: null, password: password, email: loginString}
-      const subsciption = HttpClient.post(loginUrl, payload)
+      const subsciption = LoginUtils.login(payload)
         .subscribe({
-          next(response) {
-            LoginUtils.loginDetails(response)
-          },
           error(err: Error) {
             console.error(err); // Handle errors here
             setFormErrorMsg(err.message)

@@ -1,14 +1,26 @@
+import { map } from "rxjs";
+import HttpClient from "../API/HttpClient";
 import Interceptors from "../API/Interceptors";
 import { SignalConnector } from "../API/SignalConnector";
 import store from "../store/store";
 
 export default class Login {
 
-    static loginDetails = (response) => {
-        console.log("response");
-        console.log(response);
-        console.log(response.token !== undefined);
+    static loginUrl: string = `${HttpClient.baseApiUrl}/Auth/login`
 
+    static login = (loginParams: {
+        username: string | undefined | null,
+        email: string | undefined | null,
+        password: string,
+    }) => {
+        return HttpClient.post(this.loginUrl, loginParams)
+            .pipe(map(user => {
+                this.loginDetails(user)
+                return user
+            }))
+    }
+
+    static loginDetails = (response) => {
         store.dispatch({ type: 'user/setLoggedIn', payload: true})
         if(response.user !== undefined){
             console.log(`setting user to: ${response.user}`);
@@ -17,7 +29,7 @@ export default class Login {
         }
         if(response.token !== undefined){
             store.dispatch({ type: 'user/setToken', payload: response.token})
-            localStorage.setItem("token", response.token)
+            // localStorage.setItem("token", response.token)
             // store.dispatch({type: "connector/retryConnection", payload: response.token})
         }
         SignalConnector.buildConnection()
