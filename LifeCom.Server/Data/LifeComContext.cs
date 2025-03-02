@@ -1,9 +1,9 @@
 ﻿using LifeCom.Server.Users;
 using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Chats;
-using LifeCom.Server.Chats.Messages;
 using LifeCom.Server.Chats.Channels;
-using LifeCom.Server.Users.Images;
+using LifeCom.Server.Messages;
+using LifeCom.Server.Images;
 
 namespace LifeCom.Server.Data
 {

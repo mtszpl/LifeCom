@@ -81,7 +81,6 @@ export default class Inteceptors {
                                         
                     const newToken = refreshResponse.data
                     originalRequest.headers['Authorization'] = `Bearer ${newToken}`
-                    localStorage.setItem("token", newToken)
                     store.dispatch({ type: 'user/setToken', payload: newToken})
                     const retryApi = axios.create({
                         baseURL: error.config.url,
