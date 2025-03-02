@@ -2,7 +2,6 @@ import { Autocomplete, Button, Dialog, DialogContent, DialogTitle, TextField } f
 import * as React from 'react';
 import Channel from '../../model/Channel';
 import HttpClient from '../../API/HttpClient';
-import { useSelector } from 'react-redux';
 
 export interface IChannelManagerDialogProps {
   isOpen: boolean,
@@ -20,6 +19,12 @@ export enum EMode {
 export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
   const [matchingUsers, setMatchingUsers] = React.useState<[]>([])
   const [selectedUser, setSelectedUser] = React.useState(undefined)
+
+  React.useEffect(() => {
+    return () => {
+      setSelectedUser(undefined)
+    }
+  }, [])
 
   const searchUser = (e) => {
     const userName = e.target.value
@@ -43,7 +48,16 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
     if(!selectedUser)
       return
     console.log(selectedUser)
-    HttpClient.post(`${HttpClient.baseApiUrl}/Channels/user`, selectedUser.username)
+    const subscription = HttpClient.post(`${HttpClient.baseApiUrl}/Channels/${props.channel.id}/user`, selectedUser.username)
+      .subscribe({
+        next: value => {
+          console.log(value)
+        },
+        error: (err: Error) => console.error(err),
+        complete: () => {
+          subscription.unsubscribe()
+        }
+      })
   }
 
   const titleDescription = () => {

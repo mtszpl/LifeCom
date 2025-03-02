@@ -6,6 +6,7 @@ import Chat from '../../../../model/Chat';
 import HttpClient from '../../../../API/HttpClient';
 import { Box, useTheme } from '@mui/material';
 import { CreateChannelDialog } from '../../../dialogs/CreateChannelDialog';
+import { SignalConnector } from '../../../../API/SignalConnector';
 
 export interface IChannelsComponentProps {
   selectedChatTuple : {chat: Chat | undefined, role: string}
@@ -19,6 +20,10 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   const [channelCreatorOpen, setChannelCreatorOpen] = React.useState<boolean>(false)
 
   React.useEffect(() => {
+    SignalConnector.onAddedToChannel(onAddedToChannel)
+  }, [])
+
+  React.useEffect(() => {
     setChannels([])
     if(props.selectedChatTuple.chat !== undefined)
       getChannels(props.selectedChatTuple.chat.id)
@@ -29,8 +34,13 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
     navigate(`channel/${channel.id}`)    
   }
 
+  
   const startCreatingChannel = () => {
     setChannelCreatorOpen(true)
+  }
+
+  const onAddedToChannel = (channelName) => {
+    console.log("added to channel ", channelName)
   }
 
   /**

@@ -1,12 +1,14 @@
 import { HttpTransportType, HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import HttpClient from './HttpClient';
+import store from '../store/store';
 
 export class SignalConnector {
 
     private static connection: HubConnection | undefined = undefined
+    private static eventReactionsToAdd = []
 
     static buildConnection() {
-        const token = localStorage.getItem("token")
+        const token = store.getState().userData.token
         if(token === null)
             return
         console.log("connecting")
@@ -15,14 +17,14 @@ export class SignalConnector {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets,
             accessTokenFactory: () => {
-                const token = localStorage.getItem("token")
+                const token: string | undefined = store.getState().userData.token
                 return token
             }
             })
         .build()
 
 
-        SignalConnector.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(`fug, ${e}`))
+        SignalConnector.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(e))
 
         if(SignalConnector.connection !== undefined) {
             SignalConnector.connection.onreconnecting((e) => {
@@ -30,28 +32,44 @@ export class SignalConnector {
                 alert("Lost connection to server, the site will now refresh")
                 location.reload()
             })
+            SignalConnector.connection.on("ReceiveDebugMessage", message => {
+                console.log(message)
+            })
+            SignalConnector.eventReactionsToAdd.forEach(reaction => SignalConnector.connection?.on(reaction.eventName, reaction.callback))
+            SignalConnector.eventReactionsToAdd = []
         }
 
+    }
+
+    static addCallbackToEvent(eventName: string, callback: (...args: any[]) => void) {
+        if(SignalConnector.connection)
+            SignalConnector.connection.on(eventName, callback)
+        else {
+            const newEventReaction = {
+                eventName: eventName,
+                callback: callback
+            }
+            SignalConnector.eventReactionsToAdd.push(newEventReaction)
+        }
     }
 
     static onReceiveMessage(callback: () => void) {
-        console.log("on message")
-        if(SignalConnector.connection) {
-            SignalConnector.connection.on("ReceiveMessage", (author, content) => {
-                callback()
-            })
-        }
-    }
-
-    static addToChat(){
-        if(SignalConnector.connection) {
-            SignalConnector.connection.send("AddUserToChat")
-        }
+        SignalConnector.addCallbackToEvent("ReceiveMessage", callback);
+        // if(SignalConnector.connection) {
+        //     SignalConnector.connection.on("ReceiveMessage", (author, content) => {
+        //         callback()
+        //     })
+        // }
     }
     
-    static onAddedToChat() {
-        SignalConnector.connection?.on("AddedToChannel", (channelName) => {
+    static onAddedToChannel(callback: (channelName: string) => void) {
+        SignalConnector.addCallbackToEvent("AddedToChannel", (channelName) => {
             console.log(`added to channel ${channelName}`)
+            callback(channelName)
         })
+        // SignalConnector.connection?.on("AddedToChannel", channelName => {
+        //     console.log(`added to channel ${channelName}`)
+        //     // callback();
+        // })
     }
 }
