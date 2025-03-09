@@ -4,8 +4,8 @@ namespace LifeCom.Server.Authorization
 {
     public class AuthResponse
     {
-        public UserResponse user { get; set; } = null;
+        public UserResponse? user { get; set; } = null;
         public string token { get; set; } = string.Empty;
-        public string refreshToken { get; set; }
+        public string refreshToken { get; set; } = string.Empty;
     }
 }

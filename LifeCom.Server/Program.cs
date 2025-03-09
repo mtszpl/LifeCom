@@ -10,6 +10,10 @@ using Swashbuckle.AspNetCore.Filters;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Auth.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using LifeCom.Server.Chats.Channels;
+using LifeCom.Server.Chats;
+using LifeCom.Server.Users;
+using LifeCom.Server.Messages;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +38,12 @@ builder.Services.AddSwaggerGen(options =>
     });
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ChannelService>();
+builder.Services.AddScoped<ChatService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<MessageService>();
 
 //SignalIR for Websocket
 builder.Services.AddSingleton<IUserIdProvider, LiveComIdProvider>();

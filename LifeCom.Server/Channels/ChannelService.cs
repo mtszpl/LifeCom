@@ -1,41 +1,49 @@
 ﻿using LifeCom.Server.Data;
+using LifeCom.Server.Exceptions;
+using LifeCom.Server.Hubs;
+using LifeCom.Server.Models;
 using LifeCom.Server.Users;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace LifeCom.Server.Chats.Channels
 {
     public class ChannelService
     {
         private readonly LifeComContext _context;
+        private readonly ChatService _chatService;
+        private readonly UserService _userService;
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
+        private ClaimsPrincipal? _User;
 
-        public ChannelService(LifeComContext context)
+
+        public ChannelService(
+            LifeComContext context,
+            ChatService chatService, UserService userService,
+            IAuthorizationService authorizationService, IHubContext<ChatHub, IChatClient> hubContext, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _chatService = chatService;
+            _userService = userService;
+            _authorizationService = authorizationService;
+            _httpContextAccessor = httpContextAccessor;
+            _hubContext = hubContext;
+            if(_httpContextAccessor.HttpContext != null)
+                _User = _httpContextAccessor.HttpContext.User;
         }
 
-        public List<Channel> GetOfUserById(int? userId)
-        {
-            return _context.Channel.Where(channel => channel.members.Any(member => member.Id == userId)).ToList();
-        }
-
-        public List<Channel> GetByChat(int chatId)
-        {
-            return _context.Channel.Where(ch => ch.chatId == chatId).ToList();
-        }
-
-        public List<Channel> GetByChatOfUser(int chatId, int userId)
-        {
-            return _context.Channel.Where(ch => ch.chatId == chatId && ch.members.FirstOrDefault(u => u.Id == userId) != null).ToList();
-        }
+        public List<Channel> GetByChat(int chatId) => _context.Channel.Where(ch => ch.chatId == chatId).ToList();
 
         public Task<Channel?> GetByIdAsync(int? id)
         {
             return _context.Channel.FirstOrDefaultAsync(m => m.Id == id);
         }
-        public Channel? GetById(int? id)
-        {
-            return _context.Channel.FirstOrDefault(m => m.Id == id);
-        }
+
 
         public Task<int> Remove(Channel channel)
         {
@@ -45,43 +53,20 @@ namespace LifeCom.Server.Chats.Channels
 
         public async Task<int> RemoveById(int id) 
         {
-            Channel channel = await GetByIdAsync(id);
+            Channel? channel = await GetByIdAsync(id);
             if(channel != null)            
                return await Remove(channel);
             return 0;
         }
 
-        public bool AddUserToChannel(int channelId, User user)
+        public bool AddUserToChannel(Channel channel, User user)
         {
-            Channel? channel = GetById(channelId);
-            if(channel == null)
-                return false;
             if (!channel.members.Contains(user))
                 channel.members.Add(user);
             else
                 return false;
+            _chatService.AddUser(channel.chat.Id, user.Id);
             return true;
-        }
-
-        public Channel? CreteChannel(int chatId, string name, int? creatorId)
-        {
-            User? creator = _context.Users.FirstOrDefault(u => u.Id == creatorId);
-            if (creator == null)
-                return null;             
-            
-            Channel channel = new Channel
-            {
-                chatId = chatId,
-                name = name,
-                members = new List<User> { creator }
-            };
-            if(!ChannelOfNameExists(chatId, name))
-            {
-                _context.Add(channel);
-                _context.SaveChanges();
-                return channel;
-            }    
-            return null;
         }
 
         public bool ChannelOfNameExists(int chatId, string channelName)
@@ -92,6 +77,86 @@ namespace LifeCom.Server.Chats.Channels
         public bool ChannelExists(int id)
         {
             return _context.Channel.Any(e => e.Id == id);
+        }
+
+        //new shit
+
+        public bool SetUserPrincipal()
+        {
+            if(_httpContextAccessor.HttpContext == null)
+                return false;
+            _User = _httpContextAccessor.HttpContext.User;
+            return true;
+        }
+
+        public async Task<Channel> CreateChannel(int owningChatId, ChannelRequest request)
+        {
+            //if (!SetUserPrincipal() || _User == null || _httpContextAccessor.HttpContext == null)
+            //    throw new HttpException(401, "Unauthenticated");
+            Chat? owner = _chatService.GetById(owningChatId) ?? throw new HttpException(404, "Chat doesn't exist");
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(_User, owningChatId, "ChatAdmin");
+            if (!authorizationResult.Succeeded) throw new HttpException(403, "Not allowed");
+            else if (!_User.Identity.IsAuthenticated) throw new HttpException(401, "Unknown user");
+
+            int? userId = TokenDataReader.TryReadId(_httpContextAccessor.HttpContext.User.Identity as ClaimsIdentity) ?? throw new HttpException(404, "User not found");
+            User? creator = _userService.GetById(userId) ?? throw new HttpException(404, "Chat doesn't exist");
+
+            Channel channel = new Channel
+            {
+                chatId = owningChatId,
+                name = request.name,
+                members = new List<User> { creator }
+            };
+            if (!ChannelOfNameExists(owningChatId, request.name))
+            {
+                _context.Add(channel);
+                _context.SaveChanges();
+                return channel;
+            }
+            else throw new HttpException(40, $"Channel of name {request.name} already exists in ${owner.name}");
+        }
+
+        public Channel? GetById(int? id)
+        {
+            int? userId = TokenDataReader.TryReadId(_User.Identity as ClaimsIdentity);
+            if (userId != null)
+                return _context.Channel.FirstOrDefault(m => m.Id == id);
+            throw new HttpException(404, "Not found");
+        }
+
+        /**
+         * Get channels of chat that user belongs to
+         * @param chatId ID of chat
+         */
+        public List<Channel> GetByChatOfUser(int chatId)
+        {
+            int? userId = TokenDataReader.TryReadId(_User.Identity as ClaimsIdentity) ?? throw new HttpException(401, "Unauthenticated");
+            return _context.Channel.Where(ch => ch.chatId == chatId && ch.members.Any(u => u.Id == userId)).ToList();
+        }
+
+        public List<Channel> GetOfUserById()
+        {
+            int? userId = TokenDataReader.TryReadId(_User.Identity as ClaimsIdentity) ?? throw new HttpException(401, "Unauthenticated");
+            return _context.Channel.Where(channel => channel.members.Any(member => member.Id == userId)).ToList();
+        }
+
+        public async Task AddUser(int channelId, int userId)
+        {
+            Channel? channel = _context.Channel.Include(c => c.members).Include(c => c.chat).FirstOrDefault(m => m.Id == channelId) ?? throw new HttpException(404, "Channel not found");
+            User? user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
+            Chat owningChat = channel.chat;
+
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(_User, owningChat.Id,"ChatAdmin");
+
+            if (!authorizationResult.Succeeded) throw new HttpException(403, "Forbidden");
+            if (AddUserToChannel(channel, user))
+            {
+                await _hubContext.Clients.User(user.Id.ToString()).AddedToChannel(channel);
+                _context.SaveChanges();
+            }
+            else throw new HttpException(400, "User not added");
         }
     }
 }

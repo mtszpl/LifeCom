@@ -13,23 +13,18 @@ using LifeCom.Server.Hubs;
 using LifeCom.Server.Chats.Channels;
 using Microsoft.AspNetCore.SignalR;
 using LifeCom.Server.Models;
+using LifeCom.Server.Controllers;
 
 namespace LifeCom.Server.Messages
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class MessagesController : Controller
+    public class MessagesController : IBaseLifeComController
     {
-        private readonly LifeComContext _context;
-        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
-        private readonly UserService _userService;
-        private readonly ChannelService _channelService;
-        public MessagesController(LifeComContext context, IHubContext<ChatHub, IChatClient> hubContext)
+        private readonly MessageService _messageService;
+        public MessagesController(MessageService messageService)
         {
-            _context = context;
-            _hubContext = hubContext;
-            _userService = new UserService(context);
-            _channelService = new ChannelService(context);
+            _messageService = messageService;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
@@ -42,71 +37,43 @@ namespace LifeCom.Server.Messages
         [NonAction]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Message.ToListAsync());
+            return Ok();
         }
 
         [HttpGet]
         public ActionResult<List<Message>> GetByChannelId(int id)
         {
-            List<Message> messages = _context.Message.Where(msg => msg.channelId == id).Include(msg => msg.author).ToList();
-            messages.OrderByDescending(msg => msg.timestamp).ToList();
-            return Ok(messages);
+            return HandleCall(() => _messageService.GetByChannelId(id));
         }
 
-        //[HttpGet]
-        [NonAction]
-        public async Task<List<Message>> Read()
-        {
-            ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity == null)
-                throw new InvalidOperationException("Unidentified user");
+        ////[HttpGet]
+        //[NonAction]
+        //public async Task<List<Message>> Read()
+        //{
+        //    ClaimsIdentity? identity = HttpContext.User.Identity as ClaimsIdentity;
+        //    if (identity == null)
+        //        throw new InvalidOperationException("Unidentified user");
 
-            string? userName = identity.FindFirst(ClaimTypes.Name)?.Value;
-            if (userName == null)
-                throw new InvalidOperationException("User name is null.");
-            User? sendingUser = _context.Users.Where(user => user.username == userName).FirstOrDefault();
-            if (sendingUser == null)
-                throw new InvalidOperationException("User not found.");
-            return await _context.Message.Where(msg => msg.authorId == sendingUser.Id)
-                .ToListAsync();
-        }
+        //    string? userName = identity.FindFirst(ClaimTypes.Name)?.Value;
+        //    if (userName == null)
+        //        throw new InvalidOperationException("User name is null.");
+        //    User? sendingUser = _context.Users.Where(user => user.username == userName).FirstOrDefault();
+        //    if (sendingUser == null)
+        //        throw new InvalidOperationException("User not found.");
+        //    return await _context.Message.Where(msg => msg.authorId == sendingUser.Id)
+        //        .ToListAsync();
+        //}
 
         [HttpPost]
         public async Task<ActionResult<Message>> SendMessage([FromBody] MessageRequest messageRequest)
         {
-            if (messageRequest.content == string.Empty || messageRequest.channelId == null)
-                return BadRequest("Content missing");
-
-            int? id = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (id == null)
-                return NotFound("User not found");
-
-            User? author = _userService.GetById(id);
-            if (author == null)
-                return NotFound("User not found");
-
-            Message message = new Message
-            {
-                content = messageRequest.content,
-                authorId = author.Id,
-                channelId = messageRequest.channelId
-            };
-            await _context.Message.AddAsync(message);
-            await _context.SaveChangesAsync();
-
-            await _hubContext.Clients.Group(messageRequest.channelId.ToString()).ReceiveMessage(new UserResponse(author), messageRequest.content);
-
-            return Ok(message);
+            return await HandleCall(() => _messageService.SendMessage(messageRequest));
         }
 
         [HttpGet("read")]
-        public Task<List<Message>> ReadChatMessages(int chatId)
+        public ActionResult<List<Message>> ReadChannelMessages(int channelId)
         {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-
-
-            List<Message> filteredMesages = _context.Message.Where(msg => msg.channelId == chatId).ToList();
-            return Task.FromResult(filteredMesages);
+            return HandleCall(() => _messageService.ReadChannelMessages(channelId));
         }
 
         // GET: Messages/Details/5

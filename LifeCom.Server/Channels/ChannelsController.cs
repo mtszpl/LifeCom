@@ -1,38 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using LifeCom.Server.Data;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using LifeCom.Server.Users;
-using LifeCom.Server.Models;
-using LifeCom.Server.Hubs;
-using Microsoft.AspNetCore.SignalR;
+using LifeCom.Server.Exceptions;
+using LifeCom.Server.Controllers;
 
 namespace LifeCom.Server.Chats.Channels
 {
     [Route("api/[controller]")]
     [Authorize]
-    public class ChannelsController : Controller
+    public class ChannelsController : IBaseLifeComController
     {
         private readonly ChannelService _channelService;
-        private readonly ChatService _chatService;
-        private readonly UserService _userService;
-        private readonly IHubContext<ChatHub, IChatClient> _hubContext;
-        private readonly IAuthorizationService _authorizationService;
 
 
-        public ChannelsController(LifeComContext context, IAuthorizationService authorizationService, IHubContext<ChatHub, IChatClient> hubContext)
+        public ChannelsController(ChannelService channelService)
         {
-            _channelService = new ChannelService(context);
-            _chatService = new ChatService(context);
-            _userService = new UserService(context);
-            _authorizationService = authorizationService;
-            _hubContext = hubContext;
+            _channelService = channelService;
         }
 
         // GET: Channels
@@ -45,61 +32,25 @@ namespace LifeCom.Server.Chats.Channels
         [HttpGet]
         public ActionResult<List<Channel>> GetByUser() 
         {
-            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if(userId == null)
-                return NotFound("User not found");
-
-            return _channelService.GetOfUserById(userId);
+            return HandleCall(() => _channelService.GetOfUserById());
         }
 
         [HttpGet("bychat")]
         public ActionResult<List<Channel>> GetByChat(int chatId)
         {
-            int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-            if (userId == null)
-                return NotFound("User not found");
-
-            return _channelService.GetByChatOfUser(chatId, (int)userId);
+            return HandleCall(() => _channelService.GetByChatOfUser(chatId));
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult> CreateChannelAsync(int atChat, [FromBody]ChannelRequest request)
+        public async Task<ActionResult<Channel>> CreateChannelAsync(int owningChatId, [FromBody]ChannelRequest request)
         {
-            Console.WriteLine("Creting channel");
-
-            Chat? owningChat = _chatService.GetById(request.chatId);
-            if(owningChat == null)
-                return NotFound("Chat not found");
-            AuthorizationResult authorizationResult = await _authorizationService
-                .AuthorizeAsync(User, owningChat.Id, "ChatAdmin");
-
-            if (authorizationResult.Succeeded)
-            {
-
-                int? userId = TokenDataReader.TryReadId(HttpContext.User.Identity as ClaimsIdentity);
-                if (userId == null)
-                    return NotFound("User not found");
-                Channel? channel = _channelService.CreteChannel(request.chatId, request.name, userId);
-                if (channel != null)
-                    return Ok(channel);
-                else
-                    return BadRequest("Unsuccesful");
-            }
-            else if (User.Identity.IsAuthenticated)
-                return new ForbidResult();
-            else
-                return new ChallengeResult();
+            return await HandleCall(() => _channelService.CreateChannel(owningChatId, request));
         }
 
         [HttpPost("{channelId}/user")]
-        public ActionResult AddUser(int channelId, [FromBody]string username)
+        public async Task<ActionResult> AddUser(int channelId, [FromBody]int userId)
         {
-            User? user = _userService.GetByNamePart(username).First();
-            Channel? channel = _channelService.GetById(channelId);
-            if (channel == null || user == null) return NotFound();
-            _hubContext.Clients.User(user.Id.ToString()).AddedToChannel("some fokken channel");
-            _hubContext.Clients.User(user.Id.ToString()).ReceiveDebugMessage("now this shit is working, for some fucking reason");
-            return Ok();
+            return await HandleCall(() => _channelService.AddUser(channelId, userId));
         }
 
         [HttpDelete("{channelId}/user")]
