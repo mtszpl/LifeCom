@@ -1,4 +1,5 @@
-﻿using LifeCom.Server.Chats.Channels;
+﻿using LifeCom.Server.Chats;
+using LifeCom.Server.Chats.Channels;
 using LifeCom.Server.Data;
 using LifeCom.Server.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -61,7 +62,12 @@ namespace LifeCom.Server.Hubs
 
         public async Task AddUserToChannel(string userId, Channel channel)
         {
-            await Clients.User(userId).ReceiveMessage(channel.name);
+            await Clients.User(userId).AddedToChannel(channel);
+        }
+
+        public async Task AddUserToChat(string userId, Chat chat)
+        {
+            await Clients.User(userId).AddedToChat(chat);
         }
     }
 }
