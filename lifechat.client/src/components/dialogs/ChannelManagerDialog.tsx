@@ -2,6 +2,7 @@ import { Autocomplete, Button, Dialog, DialogContent, DialogTitle, TextField } f
 import * as React from 'react';
 import Channel from '../../model/Channel';
 import HttpClient from '../../API/HttpClient';
+import User from '../../model/User';
 
 export interface IChannelManagerDialogProps {
   isOpen: boolean,
@@ -18,7 +19,7 @@ export enum EMode {
 
 export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
   const [matchingUsers, setMatchingUsers] = React.useState<[]>([])
-  const [selectedUser, setSelectedUser] = React.useState(undefined)
+  const [selectedUser, setSelectedUser] = React.useState<User | undefined>(undefined)
 
   React.useEffect(() => {
     return () => {
@@ -48,7 +49,7 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
     if(!selectedUser)
       return
     console.log(selectedUser)
-    const subscription = HttpClient.post(`${HttpClient.baseApiUrl}/Channels/${props.channel.id}/user`, selectedUser.username)
+    const subscription = HttpClient.post(`${HttpClient.baseApiUrl}/Channels/${props.channel.id}/user`, selectedUser.id)
       .subscribe({
         next: value => {
           console.log(value)

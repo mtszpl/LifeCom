@@ -32,9 +32,6 @@ export class SignalConnector {
                 alert("Lost connection to server, the site will now refresh")
                 location.reload()
             })
-            SignalConnector.connection.on("ReceiveDebugMessage", message => {
-                console.log(message)
-            })
             SignalConnector.eventReactionsToAdd.forEach(reaction => SignalConnector.connection?.on(reaction.eventName, reaction.callback))
             SignalConnector.eventReactionsToAdd = []
         }
@@ -55,21 +52,11 @@ export class SignalConnector {
 
     static onReceiveMessage(callback: () => void) {
         SignalConnector.addCallbackToEvent("ReceiveMessage", callback);
-        // if(SignalConnector.connection) {
-        //     SignalConnector.connection.on("ReceiveMessage", (author, content) => {
-        //         callback()
-        //     })
-        // }
     }
     
     static onAddedToChannel(callback: (channelName: string) => void) {
         SignalConnector.addCallbackToEvent("AddedToChannel", (channelName) => {
-            console.log(`added to channel ${channelName}`)
             callback(channelName)
         })
-        // SignalConnector.connection?.on("AddedToChannel", channelName => {
-        //     console.log(`added to channel ${channelName}`)
-        //     // callback();
-        // })
     }
 }
