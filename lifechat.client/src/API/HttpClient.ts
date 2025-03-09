@@ -69,7 +69,7 @@ export default class HttpClient {
                     "Content-Type": "application/json"
                 }
             }
-            else 
+        else 
             params.withCredentials = true 
         return params
     }

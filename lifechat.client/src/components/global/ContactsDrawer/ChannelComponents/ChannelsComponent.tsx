@@ -30,7 +30,6 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   }, [props.selectedChatTuple])
 
   const handleChannelSelect = (channel: Channel) => {
-    console.log(channel)
     navigate(`channel/${channel.id}`)    
   }
 
@@ -41,6 +40,8 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
 
   const onAddedToChannel = (channelName) => {
     console.log("added to channel ", channelName)
+    props.selectedChatTuple.chat &&
+      getChannels(props.selectedChatTuple.chat?.id)
   }
 
   /**
@@ -48,6 +49,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   * @param chatId Id of selected chat
   */
   const getChannels = (chatId: number) => {
+    setChannels([])
     const channelsSubscription = HttpClient.get(`${HttpClient.baseApiUrl}/Channels/bychat?chatId=${chatId}`)
     .subscribe({
       next(response) {
