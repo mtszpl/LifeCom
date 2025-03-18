@@ -41,7 +41,7 @@ function MainPage() {
                     complete() {
                         subsciption.unsubscribe()
                         Interceptors.addAuthInterceptor()
-                        // reroute("/main")
+                        reroute("/main")
                     }
                 });
         }

@@ -14,7 +14,7 @@ export interface IChannelManagerDialogProps {
 export enum EMode {
   add,
   remove,
-  changeRole
+  rename
 }
 
 export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
@@ -42,13 +42,38 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
   }
 
   const submit = () => {
-    addUser()
+    if(!selectedUser)
+      return
+    switch(props.mode)
+    {
+      case(EMode.add):
+        addUser()
+        break
+      case(EMode.remove):
+        removeUser()
+        break
+      case(EMode.rename):
+        break
+      default:
+        return
+
+    }
+  }
+
+  const removeUser = () => {
+    const subscription = HttpClient.delete(`${HttpClient.baseApiUrl}/Channels/${props.channel.id}/user`, selectedUser.id)
+    .subscribe({
+      next: value => {
+        console.log(value)
+      },
+      error: (err: Error) => console.error(err),
+      complete: () => {
+        subscription.unsubscribe()
+      }
+    })
   }
 
   const addUser = () => {
-    if(!selectedUser)
-      return
-    console.log(selectedUser)
     const subscription = HttpClient.post(`${HttpClient.baseApiUrl}/Channels/${props.channel.id}/user`, selectedUser.id)
       .subscribe({
         next: value => {
@@ -67,8 +92,8 @@ export function ChannelManagerDialog (props: IChannelManagerDialogProps) {
         return "Add user to channel "
       case(EMode.remove):
         return "Remove user from channel "
-      case(EMode.changeRole):
-        return "Change user role in channel "
+      case(EMode.rename):
+        return "Rename channel "
       default:
         return "Error"
     }

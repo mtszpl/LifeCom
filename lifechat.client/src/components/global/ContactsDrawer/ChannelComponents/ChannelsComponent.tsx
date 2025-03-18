@@ -20,7 +20,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   const [channelCreatorOpen, setChannelCreatorOpen] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    SignalConnector.onAddedToChannel(onAddedToChannel)
+    SignalConnector.onChangedChannelMembership(onAddedToChannel)
   }, [])
 
   React.useEffect(() => {

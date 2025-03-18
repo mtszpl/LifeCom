@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { tokens, useMode } from '../Theme';
 import logo from '../assets/logo.png';
+import { useSelector } from 'react-redux';
 
 export function LandingPage () {
 
@@ -10,10 +11,12 @@ export function LandingPage () {
     const colors = tokens(theme.palette.mode)
 
     const reroute = useNavigate()
+    const storage = useSelector(state => state.userData)
 
     React.useEffect(() => {
+        console.log(storage)
         const token = localStorage.getItem("token")
-        if(token)
+        if(token || storage.loggedIn)
           reroute("/main")
       }, [])
 

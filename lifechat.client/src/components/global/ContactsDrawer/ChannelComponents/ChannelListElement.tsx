@@ -39,7 +39,7 @@ export function ChannelListElement (props: IChannelListElementProps) {
       
     }
     const handleChangeUserRole = () => {
-      enableManager(EMode.changeRole)
+      enableManager(EMode.rename)
 
     }
 

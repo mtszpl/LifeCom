@@ -6,6 +6,7 @@ import { Box, SelectChangeEvent } from '@mui/material';
 import { useSelector } from 'react-redux';
 import HttpClient from '../../../../API/HttpClient';
 import { useNavigate } from 'react-router-dom';
+import { ChatHeader } from './ChatHeader';
 
 export interface IChatComponentProps {
     chatSelected: (chat: {chat: Chat | undefined, role: string}) => void
@@ -78,6 +79,7 @@ export function ChatComponent (props: IChatComponentProps) {
   return (
     <Box>
         <ChatSelector chatTuples={chats} selectedChat={selectedChatTuple} handleChatSelect={handleChatSelect}/>
+        <ChatHeader selectedChatTuple={selectedChatTuple}/>
         <CreateChatDialog open={chatCreatorOpen} handleCancel={() => {console.log("closing"); setChatCreatorOpen(false)}} handleReturn={createChat}/>
     </Box>
   );

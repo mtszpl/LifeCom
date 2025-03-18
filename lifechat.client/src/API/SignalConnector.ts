@@ -54,8 +54,8 @@ export class SignalConnector {
         SignalConnector.addCallbackToEvent("ReceiveMessage", callback);
     }
     
-    static onAddedToChannel(callback: (channelName: string) => void) {
-        SignalConnector.addCallbackToEvent("AddedToChannel", (channelName) => {
+    static onChangedChannelMembership(callback: (channelName: string) => void) {
+        SignalConnector.addCallbackToEvent("ChangedChannelMembership", (channelName) => {
             callback(channelName)
         })
     }
