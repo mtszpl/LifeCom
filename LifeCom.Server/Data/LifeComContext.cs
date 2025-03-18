@@ -16,10 +16,35 @@ namespace LifeCom.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.chats)
-                .WithMany(c => c.members)
-                .UsingEntity<UserChat>(j => j.Property(uc => uc.role).HasDefaultValueSql("USER"));
+            //modelBuilder.Entity<User>()
+            //    .HasMany(u => u.chats)
+            //    .WithMany(c => c.members)
+            //    .UsingEntity<UserChat>(j => j.Property(uc => uc.role).HasDefaultValueSql("USER"));
+
+            modelBuilder.Entity<UserChat>()
+                .HasKey(uc => new { uc.userId, uc.chatId });
+            
+            modelBuilder.Entity<UserChat>()
+                .HasOne(uc => uc.user)
+                .WithMany(u => u.chats)
+                .HasForeignKey(uc => uc.userId)
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<UserChat>()
+                .HasOne(uc => uc.chat)
+                .WithMany(ch => ch.members)
+                .HasForeignKey(uc => uc.chatId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
+            modelBuilder.Entity<Channel>()
+                .HasMany(c => c.messages)
+                .WithOne(m => m.channel)
+                .HasForeignKey(m => m.channelId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Chat>()
+                .HasMany(ch => ch.channels)
+                .WithOne(channel => channel.chat)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<User> Users { get; set; }

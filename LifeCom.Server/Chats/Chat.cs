@@ -10,6 +10,6 @@ namespace LifeCom.Server.Chats
         public string name { get; set; } = string.Empty;
 
         public List<Channel> channels { get; set; } = [];
-        public List<User> members { get; set; } = [];
+        public List<UserChat> members { get; set; } = new List<UserChat>();
     }
 }

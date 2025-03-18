@@ -54,11 +54,17 @@ namespace LifeCom.Server.Chats.Channels
         }
 
         [HttpDelete("{channelId}/user")]
-        [Authorize(Policy = "ChatAdmin")]
-        public void DeleteUser(int channelId, [FromBody]UserRequest user) 
+        public async Task<ActionResult> DeleteUser(int channelId, [FromBody]int userId) 
         {
-
+            return await HandleCall(() => _channelService.RemoveUser(channelId, userId));
         }
+
+        /*[HttpPut("{channelId}/user/{userId}")]
+        public async Task<ActionResult> UpdateUserPermissions(int channelId, [FromBody] int userId,
+            [FromBody] int permissions)
+        {
+            return await HandleCall(() => _channelService.ChangePermissions(channelId, userId, permissions));
+        }*/
 
         // POST: Channels/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.

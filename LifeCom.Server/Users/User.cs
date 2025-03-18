@@ -13,7 +13,7 @@ namespace LifeCom.Server.Users
         public string refreshToken {  get; set; } = string.Empty;
         public DateTime refreshExpirationTime { get; set; }
 
-        public List<Chat> chats { get; set; } = [];
+        public List<UserChat> chats { get; set; } = new List<UserChat>();
         public List<Channel> channels { get; set; } = [];
     }
 }

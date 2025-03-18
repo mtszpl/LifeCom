@@ -32,7 +32,9 @@ namespace LifeCom.Server.Models
                     password = "IamStupid1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("IamStupid1!"),
                     email = "charles.legreg@ferrari.it",
-                    chats = new List<Chat> { ferrariChat },
+                    chats = new List<UserChat> { 
+                        new UserChat { chat = ferrariChat } 
+                    },
                     channels = new List<Channel> { driversChannel }
                 };
                 User carlos = new User
@@ -41,7 +43,9 @@ namespace LifeCom.Server.Models
                     password = "SmoothOperator1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("SmoothOperator1!"),
                     email = "carlos.sainz@ferrari.it",
-                    chats = new List<Chat> { ferrariChat },
+                    chats = new List<UserChat> {
+                        new UserChat { chat = ferrariChat }
+                    },
                     channels = new List<Channel> { driversChannel }
                 };
                 User kimi = new User
@@ -50,7 +54,9 @@ namespace LifeCom.Server.Models
                     password = "Bwoah1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("Bwoah1!"),
                     email = "kimi.raikkonen@alfa.ch",
-                    chats = new List<Chat> { ferrariChat },
+                    chats = new List<UserChat> {
+                        new UserChat { chat = ferrariChat }
+                    },
                     channels = new List<Channel> { formerDriversChannel }
                 };       
                 User seb = new User
@@ -59,7 +65,9 @@ namespace LifeCom.Server.Models
                     password = "Sbinalla1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("Sbinalla1!"),
                     email = "sebastian.vettel@astonmartin.uk",
-                    chats = new List<Chat> { ferrariChat },
+                    chats = new List<UserChat> {
+                        new UserChat { chat = ferrariChat }
+                    },
                     channels = new List<Channel> { formerDriversChannel }
                 };
                 User sbinotto = new User
@@ -68,7 +76,9 @@ namespace LifeCom.Server.Models
                     password = "ProntoLegreg1!",
                     passwordHash = BCrypt.Net.BCrypt.HashPassword("ProntoLegreg1!"),
                     email = "mattia.binotto@ferrari.it",
-                    chats = new List<Chat> { ferrariChat },
+                    chats = new List<UserChat> {
+                        new UserChat { chat = ferrariChat }
+                    },
                     channels = new List<Channel> { driversChannel, formerDriversChannel }
                 };
                 UserChat sbinottoChat = new UserChat

@@ -59,12 +59,23 @@ namespace LifeCom.Server.Chats
             return true;
         }
 
-        public bool ContainsUser(int chatId, int userId)
+        private bool ContainsUser(int chatId, int userId)
         {
-            return _context.Chat
-                .Where(ch => ch.Id == chatId)
-                .SelectMany(ch => ch.members)
-                .Any(u => u.Id == userId);
+            return _context.UserChats
+                .FirstOrDefault(uc => uc.chatId == chatId && uc.userId == userId) != null;
+            // return _context.Chat
+            //     .Where(ch => ch.Id == chatId)
+            //     .SelectMany(ch => ch.members)
+            //     .Any(u => u.Id == userId);
+        }
+        
+        public async Task AddMember(int chatId, int userId)
+        {
+            User user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
+            AuthorizationResult authorizationResult = await _authorizationService
+                .AuthorizeAsync(_User, chatId, ERole.User.ToString());
+            if (!authorizationResult.Succeeded) throw new HttpException(403);
+            AddUser(chatId, userId);
         }
 
         public bool AddUser(int chatId, int userId)
@@ -73,14 +84,14 @@ namespace LifeCom.Server.Chats
             Chat? chat = _context.Chat.Include(ch => ch.members).Include(ch => ch.channels).FirstOrDefault(ch => ch.Id == chatId);
             if(chat == null) return false;
 
-            if(chat.members.Any(m => m.Id == userId)) return true;
+            if(chat.members.Any(m => m.userId == userId)) return true;
 
-            User? user = _context.Users.FirstOrDefault(u => u.Id == userId);
-            if(user == null) return false;
-            chat.members.Add(user);
-            foreach(Channel channel  in chat.channels)
-                if (channel.isPublic)
-                    channel.members.Add(user);
+            User? user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
+            UserChat userChat = new UserChat { user = user, chat = chat };
+            chat.members.Add(userChat);
+            user.chats.Add(userChat);
+            foreach (Channel channel in chat.channels.Where(channel => channel.isPublic))
+                channel.members.Add(user);
             
             _context.SaveChanges();
             return true;
@@ -105,15 +116,6 @@ namespace LifeCom.Server.Chats
             if (!authorizationResult.Succeeded) throw new HttpException(403);
             userChat.role = role;
             _context.SaveChanges();
-        }
-
-        public async Task AddMember(int chatId, int userId)
-        {
-            User user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
-            AuthorizationResult authorizationResult = await _authorizationService
-                .AuthorizeAsync(_User, chatId, ERole.User.ToString());
-            if (!authorizationResult.Succeeded) throw new HttpException(403);
-            AddUser(chatId, userId);
         }
     }
 }

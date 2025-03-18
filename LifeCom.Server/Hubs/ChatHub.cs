@@ -62,7 +62,7 @@ namespace LifeCom.Server.Hubs
 
         public async Task AddUserToChannel(string userId, Channel channel)
         {
-            await Clients.User(userId).AddedToChannel(channel);
+            await Clients.User(userId).ChangedChannelMembership(channel);
         }
 
         public async Task AddUserToChat(string userId, Chat chat)

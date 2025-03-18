@@ -69,6 +69,15 @@ namespace LifeCom.Server.Chats.Channels
             return true;
         }
 
+        public bool RemoveUserFromChannel(Channel channel, User user)
+        {
+            if(channel.members.Contains(user))
+                channel.members.Remove(user);
+            else
+                return false;
+            return true;
+        }
+
         public bool ChannelOfNameExists(int chatId, string channelName)
         {
             return _context.Channel.Join(_context.Chat, cn => cn.chatId, ch => ch.Id, (cn, chatId) => cn).Any(e => e.name == channelName);
@@ -143,6 +152,18 @@ namespace LifeCom.Server.Chats.Channels
 
         public async Task AddUser(int channelId, int userId)
         {
+            await AddOrRemoveUser(channelId, userId, true);
+        }
+        public async Task RemoveUser(int channelId, int userId)
+        {
+            await AddOrRemoveUser(channelId, userId, false);
+        }
+
+        /// <param name="channelId">ID of channel to manipulate</param>
+        /// <param name="userId">ID of user to add or remove</param>
+        /// <param name="direction">true to add, false to remove</param>
+        private async Task AddOrRemoveUser(int channelId, int userId, bool direction)
+        {
             Channel? channel = _context.Channel.Include(c => c.members).Include(c => c.chat).FirstOrDefault(m => m.Id == channelId) ?? throw new HttpException(404, "Channel not found");
             User? user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
             Chat owningChat = channel.chat;
@@ -151,12 +172,16 @@ namespace LifeCom.Server.Chats.Channels
                 .AuthorizeAsync(_User, owningChat.Id,"ChatAdmin");
 
             if (!authorizationResult.Succeeded) throw new HttpException(403, "Forbidden");
-            if (AddUserToChannel(channel, user))
+            bool success = direction ?
+                AddUserToChannel(channel, user) :
+                RemoveUserFromChannel(channel, user);
+            if (success)
             {
-                await _hubContext.Clients.User(user.Id.ToString()).AddedToChannel(channel);
+                await _hubContext.Clients.User(user.Id.ToString()).ChangedChannelMembership(channel);
                 _context.SaveChanges();
             }
             else throw new HttpException(400, "User not added");
         }
     }
+
 }
