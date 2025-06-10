@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogContent, DialogTitle } from '@mui/material';
+import { Autocomplete, Box, Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import Chat from '../../model/Chat';
 
@@ -33,17 +33,61 @@ export function ChatManagerDialog (props: IChatManagerDialogProps) {
         }
     }
 
+    const content = () => {
+        switch(props.mode){
+            case(EChatMode.addUser):
+            case(EChatMode.removeUser):
+                return (
+                    <Typography variant='h4'>
+                        Select user to {props.mode === EChatMode.addUser ?
+                         "add" : "remove"}
+                    </Typography>
+                )
+            case(EChatMode.rename):
+                return (
+                    <TextField
+                        label="New name for chat:"
+                        variant="filled"
+                    />
+                )
+            case(EChatMode.changeUserRole):
+                return (
+                    <Typography>
+                        PLACEHOLDER
+                    </Typography>
+                )
+            default:
+                return (
+                    <Typography>
+                        Error occured, please try again
+                    </Typography>
+                )
+        }
+    }
+
+    React.useEffect(() => {
+        console.log(props)
+    }, [props])
+
   return (
     <Dialog open={props.isOpen}
         onClose={props.onClose}
     >
         <DialogTitle variant="h3"
         >
-            {titleDescription()}
-            {props.chat.name}
+            {titleDescription()}: <br/>
+            {props.chat?.name || ""}
         </DialogTitle>
         <DialogContent>
-            
+            {content()}
+            <Box margin="1rem" display="flex" justifyContent="space-around">
+                <Button variant="contained">
+                    Confirm
+                </Button>
+                <Button variant="contained" color='error'>
+                    Cancel
+                </Button>
+            </Box>
         </DialogContent>
     </Dialog>
   );
