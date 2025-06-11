@@ -12,6 +12,28 @@ using System.Security.Principal;
 
 namespace LifeCom.Server.Hubs
 {
+
+    public static class UserConnectionHandler
+    {
+        public static Dictionary<int, string> UserConnectionMapping = new Dictionary<int, string>();
+
+        public static void AddConnection(int userId, string connectionId)
+        {
+            UserConnectionMapping.Add(userId, connectionId);
+        }
+
+        public static string GetUserConnectionId(int userId)
+        {
+            return UserConnectionMapping[userId];
+        }
+
+        public static void RemoveConnection(int userId)
+        {
+            UserConnectionMapping.Remove(userId);
+        }
+    }
+
+
     [Authorize]
     public class ChatHub : Hub<IChatClient>
     {
@@ -47,12 +69,27 @@ namespace LifeCom.Server.Hubs
             }
             foreach(Channel channel in user.channels)
                 await JoinChannel(channel.Id);
-            await Groups.AddToGroupAsync(Context.ConnectionId.ToString(), user.Id.ToString());
+            //await Groups.AddToGroupAsync(Context.ConnectionId.ToString(), user.Id.ToString());
+            try
+            {
+                UserConnectionHandler.AddConnection(user.Id, Context.ConnectionId);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override async Task OnDisconnectedAsync(Exception? e)
         {
-            return base.OnDisconnectedAsync(exception);
+            await base.OnDisconnectedAsync(e);
+            ClaimsIdentity? identity = Context.User.Identity as ClaimsIdentity;
+            if (identity == null) return;
+            int? id = int.Parse(identity.FindFirst("id").Value);
+
+            User user = _context.Users.Include(u => u.channels).SingleOrDefault(u => u.Id == id);
+            UserConnectionHandler.RemoveConnection(user.Id);
         }
 
         public async Task SendMessage(User author, string message)

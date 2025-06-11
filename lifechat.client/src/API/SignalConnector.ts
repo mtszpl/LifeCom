@@ -26,19 +26,19 @@ export class SignalConnector {
 
         SignalConnector.connection!.start().then(() => console.log("connected")).catch( (e: any) => console.log(e))
 
-        if(SignalConnector.connection !== undefined) {
+        if(SignalConnector.connection) {
             SignalConnector.connection.onreconnecting((e) => {
                 console.error(e?.message)
                 alert("Lost connection to server, the site will now refresh")
                 location.reload()
             })
-            SignalConnector.eventReactionsToAdd.forEach(reaction => SignalConnector.connection?.on(reaction.eventName, reaction.callback))
+            SignalConnector.eventReactionsToAdd.forEach(reaction => SignalConnector.connection.on(reaction.eventName, reaction.callback))
             SignalConnector.eventReactionsToAdd = []
         }
 
     }
 
-    static addCallbackToEvent(eventName: string, callback: (...args: any[]) => void) {
+    private static addCallbackToEvent(eventName: string, callback: (...args: any[]) => void) {
         if(SignalConnector.connection)
             SignalConnector.connection.on(eventName, callback)
         else {
@@ -55,8 +55,11 @@ export class SignalConnector {
     }
     
     static onChangedChannelMembership(callback: (channelName: string) => void) {
-        SignalConnector.addCallbackToEvent("ChangedChannelMembership", (channelName) => {
-            callback(channelName)
-        })
+        console.clear()
+        console.log("addding callback");
+        // SignalConnector.addCallbackToEvent("ChangedChannelMembership", (channelName) => {
+        //     console.log("called");
+        //     callback(channelName)
+        // })
     }
 }

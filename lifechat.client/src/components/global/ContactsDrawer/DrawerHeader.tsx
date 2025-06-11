@@ -15,7 +15,7 @@ export function DrawerHeader (props: IDrawerHeaderProps) {
         <Typography variant="h3">
         Contacts
         </Typography>
-        <IconButton onClick={() => toggleOpen()}>
+        <IconButton onClick={() => props.handleOpen()}>
             <ChevronLeft/>
         </IconButton>
 </Box>

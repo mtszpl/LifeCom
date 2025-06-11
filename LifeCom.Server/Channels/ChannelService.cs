@@ -1,6 +1,7 @@
 ﻿using LifeCom.Server.Data;
 using LifeCom.Server.Exceptions;
 using LifeCom.Server.Hubs;
+using LifeCom.Server.Messages;
 using LifeCom.Server.Models;
 using LifeCom.Server.Users;
 using Microsoft.AspNetCore.Authorization;
@@ -167,7 +168,9 @@ namespace LifeCom.Server.Chats.Channels
             Channel? channel = _context.Channel.Include(c => c.members).Include(c => c.chat).FirstOrDefault(m => m.Id == channelId) ?? throw new HttpException(404, "Channel not found");
             User? user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
             Chat owningChat = channel.chat;
-
+            await _hubContext.Clients.All.ChangedChannelMembership(channel);
+            // Clients.User(UserConnectionHandler.UserConnectionMapping[user.Id]).ChangedChannelMembership(channel);
+            return;
             AuthorizationResult authorizationResult = await _authorizationService
                 .AuthorizeAsync(_User, owningChat.Id,"ChatAdmin");
 
@@ -178,7 +181,7 @@ namespace LifeCom.Server.Chats.Channels
             if (success)
             {
                 await _hubContext.Clients.User(user.Id.ToString()).ChangedChannelMembership(channel);
-                _context.SaveChanges();
+               // _context.SaveChanges();
             }
             else throw new HttpException(400, "User not added");
         }
