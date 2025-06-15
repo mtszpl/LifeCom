@@ -17,10 +17,11 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   const navigate = useNavigate()
 
   const [channels, setChannels] = React.useState<Channel[]>([])
+  const [selectedChannel, setSelectedChannel] = React.useState<Channel | null | undefined>()
   const [channelCreatorOpen, setChannelCreatorOpen] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    SignalConnector.onChangedChannelMembership(onAddedToChannel)
+    SignalConnector.onChangedChannelMembership(onChangedChannelMembership)
   }, [])
 
   React.useEffect(() => {
@@ -31,6 +32,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   }, [props.selectedChatTuple])
 
   const handleChannelSelect = (channel: Channel) => {
+    setSelectedChannel(channel)
     navigate(`channel/${channel.id}`)    
   }
   
@@ -38,7 +40,7 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
     setChannelCreatorOpen(true)
   }
 
-  const onAddedToChannel = (chatId: number) => {
+  const onChangedChannelMembership = (chatId: number) => {
     getChannels(chatId)
   }
 
@@ -56,6 +58,10 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
       },
       error(err: Error) { console.error(err.message)},
       complete() {
+        if(!channels.find(channel => channel.id === selectedChannel?.id)){
+          setSelectedChannel(null)
+          navigate("/")  
+        }
         channelsSubscription.unsubscribe()
       }
     })
