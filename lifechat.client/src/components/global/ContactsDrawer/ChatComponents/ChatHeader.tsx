@@ -15,11 +15,6 @@ export function ChatHeader (props: IChatHeaderProps) {
     const [isManagerOpen, setManagerOpen] = React.useState<boolean>(false)
     const [isMenuOpen, setMenuOpen] = React.useState<boolean>(false)
     const [chatManagerMode, setChatManagerMode] = React.useState<EChatMode | undefined>(undefined)
-
-    React.useEffect(() => {
-        console.clear()
-        console.log(props.selectedChatTuple)
-    }, [props.selectedChatTuple])
     
     const handleMenuOpen = (e: MouseEvent) => {
         e.stopPropagation()

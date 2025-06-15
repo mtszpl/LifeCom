@@ -77,12 +77,7 @@ namespace LifeCom.Server.Hubs
         public override async Task OnDisconnectedAsync(Exception? e)
         {
             await base.OnDisconnectedAsync(e);
-            ClaimsIdentity? identity = Context.User.Identity as ClaimsIdentity;
-            if (identity == null) return;
-            int? id = int.Parse(identity.FindFirst("id").Value);
-
-            User user = _context.Users.Include(u => u.channels).SingleOrDefault(u => u.Id == id);
-            UserConnectionHandler.RemoveConnection(user.Id.ToString());
+            UserConnectionHandler.RemoveConnection(Context.ConnectionId);
         }
 
         public async Task SendMessage(User author, string message)

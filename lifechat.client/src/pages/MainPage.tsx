@@ -1,19 +1,15 @@
 import { Box, Theme, useTheme } from "@mui/material";
-import { useDispatch, useSelector,  } from "react-redux";
+import { useSelector,  } from "react-redux";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Topbar } from "../components/global/Tobpar";
 import { ContactsDrawer } from "../components/global/ContactsDrawer/ContactsDrawer";
 import Interceptors from "../API/Interceptors";
-import { setLoggedIn, setToken, setUser } from "../store/slices/UserSlice";
-import HttpClient from "../API/HttpClient";
-import { SignalConnector } from "../API/SignalConnector";
 import LoginUtils from "../utility/LoginUtils";
 
 function MainPage() {
 
     const theme: Theme = useTheme()
-    const dispatch = useDispatch()
     const isLogged = useSelector(state => state.userData.loggedIn)
 
     const reroute = useNavigate()

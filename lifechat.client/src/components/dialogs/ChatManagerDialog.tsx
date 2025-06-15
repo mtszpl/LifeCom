@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogTitle, TextField, Typography } from '@mui/material';
 import * as React from 'react';
 import Chat from '../../model/Chat';
 
@@ -64,10 +64,6 @@ export function ChatManagerDialog (props: IChatManagerDialogProps) {
                 )
         }
     }
-
-    React.useEffect(() => {
-        console.log(props)
-    }, [props])
 
   return (
     <Dialog open={props.isOpen}

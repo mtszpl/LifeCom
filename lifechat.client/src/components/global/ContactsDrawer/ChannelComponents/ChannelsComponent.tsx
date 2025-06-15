@@ -28,7 +28,6 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
     if(props.selectedChatTuple.chat !== undefined) {
       getChannels(props.selectedChatTuple.chat.id)
     }
-    console.log(`changed ${props.selectedChatTuple}`);
   }, [props.selectedChatTuple])
 
   const handleChannelSelect = (channel: Channel) => {

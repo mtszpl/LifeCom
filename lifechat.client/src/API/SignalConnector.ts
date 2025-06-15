@@ -13,7 +13,6 @@ export class SignalConnector {
             return
         if(SignalConnector.connection)
             return;
-        console.log("connecting")
         SignalConnector.connection = new HubConnectionBuilder()
         .withUrl(`${HttpClient.serverUrl}/hub`, {
             skipNegotiation: true,
@@ -31,7 +30,6 @@ export class SignalConnector {
         if(SignalConnector.connection) {
             SignalConnector.connection.onreconnecting((e) => {
                 console.error(e?.message)
-                alert("Lost connection to server, the site will now refresh")
                 location.reload()
             })
             SignalConnector.eventReactionsToAdd.forEach(reaction => SignalConnector.connection.on(reaction.eventName, reaction.callback))
@@ -57,10 +55,7 @@ export class SignalConnector {
     }
     
     static onChangedChannelMembership(callback: (owningChatId: number) => void) {
-        console.clear()
-        console.log("addding callback");
         SignalConnector.addCallbackToEvent("ChangedChannelMembership", (owningChatId) => {
-            console.log("called");
             callback(owningChatId)
         })
     }
