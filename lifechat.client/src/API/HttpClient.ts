@@ -76,7 +76,7 @@ export default class HttpClient {
 
     private static executeRequest = (axiosPromise: Promise<AxiosResponse<any, any>>) => {
         return from(axiosPromise.then(response => {
-            return response.data
+            return response.data ?? null
         }).catch(error => {
             if (error.response) {
                 throw new Error(error.response.data || error.response.statusText)
@@ -89,6 +89,7 @@ export default class HttpClient {
     private static request = (method: "get" | "post" | "put" | "delete", url: string, params?: any, payload?: any) => {
         params = HttpClient.processParams(params);
         let axiosPromise
+        console.log(params);
         switch(method){
             case "get":
                 axiosPromise = HttpClient.API.get(url, params)
@@ -100,7 +101,7 @@ export default class HttpClient {
                 axiosPromise = HttpClient.API.put(url, payload, params)
                 break;
             case "delete":
-                axiosPromise = HttpClient.API.delete(url, payload)
+                axiosPromise = HttpClient.API.delete(url, { data:payload,  ...params })
                 break;
         }
         // axios({method: method, url: url, data: payload, headers: params.headers})
