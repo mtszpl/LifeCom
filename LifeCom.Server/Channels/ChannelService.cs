@@ -168,9 +168,7 @@ namespace LifeCom.Server.Chats.Channels
             Channel? channel = _context.Channel.Include(c => c.members).Include(c => c.chat).FirstOrDefault(m => m.Id == channelId) ?? throw new HttpException(404, "Channel not found");
             User? user = _userService.GetById(userId) ?? throw new HttpException(404, "User not found");
             Chat owningChat = channel.chat;
-            await _hubContext.Clients.All.ChangedChannelMembership(channel);
-            // Clients.User(UserConnectionHandler.UserConnectionMapping[user.Id]).ChangedChannelMembership(channel);
-            return;
+
             AuthorizationResult authorizationResult = await _authorizationService
                 .AuthorizeAsync(_User, owningChat.Id,"ChatAdmin");
 
@@ -179,9 +177,12 @@ namespace LifeCom.Server.Chats.Channels
                 AddUserToChannel(channel, user) :
                 RemoveUserFromChannel(channel, user);
             if (success)
-            {
-                await _hubContext.Clients.User(user.Id.ToString()).ChangedChannelMembership(channel);
-               // _context.SaveChanges();
+            { 
+                _context.SaveChanges();
+                _hubContext.Clients.User(user.Id.ToString()).ChangedChannelMembership(channel.chatId);
+                List<KeyValuePair<string, int>> addedUserConnections = UserConnectionHandler.GetUserConnectionId(userId);
+                foreach(KeyValuePair<string, int> pair in addedUserConnections)
+                    _hubContext.Groups.AddToGroupAsync(pair.Key, channel.Id.ToString());
             }
             else throw new HttpException(400, "User not added");
         }

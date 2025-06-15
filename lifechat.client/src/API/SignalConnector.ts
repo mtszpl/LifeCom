@@ -11,6 +11,8 @@ export class SignalConnector {
         const token = store.getState().userData.token
         if(token === null)
             return
+        if(SignalConnector.connection)
+            return;
         console.log("connecting")
         SignalConnector.connection = new HubConnectionBuilder()
         .withUrl(`${HttpClient.serverUrl}/hub`, {
@@ -54,12 +56,12 @@ export class SignalConnector {
         SignalConnector.addCallbackToEvent("ReceiveMessage", callback);
     }
     
-    static onChangedChannelMembership(callback: (channelName: string) => void) {
+    static onChangedChannelMembership(callback: (owningChatId: number) => void) {
         console.clear()
         console.log("addding callback");
-        // SignalConnector.addCallbackToEvent("ChangedChannelMembership", (channelName) => {
-        //     console.log("called");
-        //     callback(channelName)
-        // })
+        SignalConnector.addCallbackToEvent("ChangedChannelMembership", (owningChatId) => {
+            console.log("called");
+            callback(owningChatId)
+        })
     }
 }

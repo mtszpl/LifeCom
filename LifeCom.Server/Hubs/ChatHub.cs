@@ -15,21 +15,21 @@ namespace LifeCom.Server.Hubs
 
     public static class UserConnectionHandler
     {
-        public static Dictionary<int, string> UserConnectionMapping = new Dictionary<int, string>();
+        public static Dictionary<string, int> UserConnectionMapping = new Dictionary<string, int>();
 
-        public static void AddConnection(int userId, string connectionId)
+        public static void AddConnection(string connectionId, int userIdentifier)
         {
-            UserConnectionMapping.Add(userId, connectionId);
+            UserConnectionMapping.Add(connectionId, userIdentifier);
         }
 
-        public static string GetUserConnectionId(int userId)
+        public static List<KeyValuePair<string, int>> GetUserConnectionId(int userIdentifier)
         {
-            return UserConnectionMapping[userId];
+            return UserConnectionMapping.Where(tuple => tuple.Value == userIdentifier).ToList();
         }
 
-        public static void RemoveConnection(int userId)
+        public static void RemoveConnection(string connectionId)
         {
-            UserConnectionMapping.Remove(userId);
+            UserConnectionMapping.Remove(connectionId);
         }
     }
 
@@ -67,17 +67,10 @@ namespace LifeCom.Server.Hubs
                 await Clients.All.ReceiveMessage("Error, no user found");
                 return;
             }
-            foreach(Channel channel in user.channels)
+            UserConnectionHandler.AddConnection(Context.ConnectionId, Int32.Parse(Context.UserIdentifier));
+            foreach (Channel channel in user.channels)
                 await JoinChannel(channel.Id);
             //await Groups.AddToGroupAsync(Context.ConnectionId.ToString(), user.Id.ToString());
-            try
-            {
-                UserConnectionHandler.AddConnection(user.Id, Context.ConnectionId);
-            }
-            catch (Exception ex)
-            {
-
-            }
 
         }
 
@@ -89,7 +82,7 @@ namespace LifeCom.Server.Hubs
             int? id = int.Parse(identity.FindFirst("id").Value);
 
             User user = _context.Users.Include(u => u.channels).SingleOrDefault(u => u.Id == id);
-            UserConnectionHandler.RemoveConnection(user.Id);
+            UserConnectionHandler.RemoveConnection(user.Id.ToString());
         }
 
         public async Task SendMessage(User author, string message)
@@ -99,7 +92,7 @@ namespace LifeCom.Server.Hubs
 
         public async Task AddUserToChannel(string userId, Channel channel)
         {
-            await Clients.User(userId).ChangedChannelMembership(channel);
+            await Clients.User(userId).ChangedChannelMembership(channel.chatId);
         }
 
         public async Task AddUserToChat(string userId, Chat chat)

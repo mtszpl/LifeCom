@@ -25,23 +25,22 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
 
   React.useEffect(() => {
     setChannels([])
-    if(props.selectedChatTuple.chat !== undefined)
+    if(props.selectedChatTuple.chat !== undefined) {
       getChannels(props.selectedChatTuple.chat.id)
+    }
+    console.log(`changed ${props.selectedChatTuple}`);
   }, [props.selectedChatTuple])
 
   const handleChannelSelect = (channel: Channel) => {
     navigate(`channel/${channel.id}`)    
   }
-
   
   const startCreatingChannel = () => {
     setChannelCreatorOpen(true)
   }
 
-  const onAddedToChannel = (channelName) => {
-    console.log("added to channel ", channelName)
-    props.selectedChatTuple.chat &&
-      getChannels(props.selectedChatTuple.chat?.id)
+  const onAddedToChannel = (chatId: number) => {
+    getChannels(chatId)
   }
 
   /**

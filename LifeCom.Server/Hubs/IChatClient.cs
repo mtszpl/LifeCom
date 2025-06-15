@@ -8,7 +8,7 @@ namespace LifeCom.Server.Hubs
     {
         Task ReceiveMessage(UserResponse author, string content);
         Task ReceiveMessage(string content);
-        Task ChangedChannelMembership(Channel channel);
+        Task ChangedChannelMembership(int chatId);
         Task AddedToChat(Chat chat);
         Task CreateChannel();
     }
