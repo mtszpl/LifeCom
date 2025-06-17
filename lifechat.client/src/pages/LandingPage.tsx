@@ -14,7 +14,6 @@ export function LandingPage () {
     const storage = useSelector(state => state.userData)
 
     React.useEffect(() => {
-        console.log(storage)
         const token = localStorage.getItem("token")
         if(token || storage.loggedIn)
           reroute("/main")

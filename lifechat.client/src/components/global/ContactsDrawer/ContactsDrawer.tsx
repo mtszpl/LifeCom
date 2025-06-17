@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import { Drawer} from '@mui/material';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Chat from '../../../model/Chat';
 import { DrawerHeader } from './DrawerHeader';
 import { ChatComponent } from './ChatComponents/ChatComponent';
@@ -31,7 +31,7 @@ export function ContactsDrawer (props: IDrawerProps) {
   useEffect(() => setDrawerOpen(props.open), [props.open])
 
   //Getting channels on chat change
-  const changeChat = (chatTuple: {chat: Chat | undefined, role: string}) => {    
+  const changeChat = (chatTuple: {chat: Chat | undefined, role: string}) => {   
     if(chatTuple.chat != undefined)
       setSelectedChatTuple(chatTuple)
     else

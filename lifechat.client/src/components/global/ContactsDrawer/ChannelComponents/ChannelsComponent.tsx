@@ -50,17 +50,19 @@ export function ChannelsComponent (props: IChannelsComponentProps) {
   */
   const getChannels = (chatId: number) => {
     setChannels([])
+    let tmpChannels: Channel[] = []
     const channelsSubscription = HttpClient.get(`${HttpClient.baseApiUrl}/Channels/bychat?chatId=${chatId}`)
     .subscribe({
-      next(response) {
+      next(response: Channel[]) {
+        tmpChannels = response
         if(response !== undefined)
           setChannels(response)
       },
       error(err: Error) { console.error(err.message)},
       complete() {
-        if(!channels.find(channel => channel.id === selectedChannel?.id)){
+        if(selectedChannel && !tmpChannels.find(channel => channel.id === selectedChannel?.id && channel.chatId === selectedChannel?.chatId)){
           setSelectedChannel(null)
-          navigate("/")  
+          navigate("/main/channel")  
         }
         channelsSubscription.unsubscribe()
       }

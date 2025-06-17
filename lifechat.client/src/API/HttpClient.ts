@@ -89,7 +89,6 @@ export default class HttpClient {
     private static request = (method: "get" | "post" | "put" | "delete", url: string, params?: any, payload?: any) => {
         params = HttpClient.processParams(params);
         let axiosPromise
-        console.log(params);
         switch(method){
             case "get":
                 axiosPromise = HttpClient.API.get(url, params)

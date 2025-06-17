@@ -32,6 +32,13 @@ export function ChatComponent (props: IChatComponentProps) {
     
       }, [isLoggedIn])  
 
+    //Getting channels on chat change
+    React.useEffect(() => {
+        selectedChatTuple.chat !== undefined ?
+            props.chatSelected(selectedChatTuple) :
+            props.chatSelected(noChatTuple)
+    }, [selectedChatTuple])
+
     /**
     * Loads chats of logged user
     */
@@ -50,6 +57,7 @@ export function ChatComponent (props: IChatComponentProps) {
 
 
     const handleChatSelect = (e: SelectChangeEvent) => {
+      e.preventDefault()
         if(e.target.value.chat === undefined){
           if(e.target.value.role === "Add")
             setChatCreatorOpen(true)      
@@ -68,13 +76,6 @@ export function ChatComponent (props: IChatComponentProps) {
       getChats()
       // selectChat(name)
     }
-
-    //Getting channels on chat change
-    React.useEffect(() => {
-        selectedChatTuple.chat !== undefined ?
-            props.chatSelected(selectedChatTuple) :
-            props.chatSelected(noChatTuple)
-    }, [selectedChatTuple])
 
   return (
     <Box>
